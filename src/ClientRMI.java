@@ -2,7 +2,7 @@ import java.rmi.registry.LocateRegistry;
 import java.util.Scanner;
 
 public class ClientRMI {
-
+//ola
 	public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);
 		try {
