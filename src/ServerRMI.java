@@ -15,7 +15,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceRMI {
 	public ServerRMI() throws RemoteException {
 		super();
 	}
-
+	//whatsup
 	public void SaveRegistry(String string) throws RemoteException {
 
 		File arquivo = new File("teste.txt");
