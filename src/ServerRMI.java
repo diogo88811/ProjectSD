@@ -39,6 +39,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceRMI {
 			bw.writeObject(pessoa);
 			bw.close();
 			fw.close();
+			System.out.println("OLA AMIGOS !!");
 			System.out.println("SUCCESSFULLY REGISTERED !");
 
 		} catch (FileNotFoundException e) {
