@@ -40,6 +40,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceRMI {
 			bw.close();
 			fw.close();
 			System.out.println("SUCCESSFULLY REGISTERED !");
+			// ESTAMOS A EXPERIMENTAR O GIT HUBIS IN THE PIDINGINGS NIGHTINGS
 
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
