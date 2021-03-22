@@ -13,11 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	ArrayList<Pessoa> Estudantes = new ArrayList<Pessoa>(); 
 	ArrayList<Pessoa> Docentes = new ArrayList<Pessoa>(); 
 	ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>(); 
 	ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
-	static ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
+	ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
 
 	public ServerRMI() throws RemoteException {
 		super();
@@ -96,7 +100,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	public void saveClients(String name, InterfaceClientRMI a) throws RemoteException{
 		System.out.println("Subscribing " + name);
 		clients.add(a);
-		System.out.print("> ");
 	}
 	
 	public void print_on_server(String s) throws RemoteException {
@@ -118,7 +121,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			while(true){
 				System.out.print("> ");
 				a = reader.readLine();
-				clients.get(0).print_on_client(a);
+				h.clients.get(0).print_on_client(a);
 			}
 		} catch (RemoteException re) {
 			System.out.println("Exception in HelloImpl.main: " + re);

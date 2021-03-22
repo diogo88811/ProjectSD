@@ -1,18 +1,22 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
-public class ClientRMI implements InterfaceClientRMI, Serializable {
+public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	String nome;
 
 	ClientRMI() throws RemoteException {
 		super();
 	}
 
-	public ClientRMI(String nome) {
+	public ClientRMI(String nome) throws RemoteException{
 		this.nome = nome;
 	}
 
@@ -43,9 +47,7 @@ public class ClientRMI implements InterfaceClientRMI, Serializable {
 			h.saveClients(args[0], (InterfaceClientRMI) client);
 
 			while (true) {
-
 				menuOption = scan.nextInt();
-
 				switch(menuOption){
 					case 1:
 						Pessoa pessoa = new Pessoa();
