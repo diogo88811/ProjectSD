@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Scanner;
 
 public class ClientRMI implements InterfaceClientRMI, Serializable {
 	String nome;
@@ -25,7 +26,8 @@ public class ClientRMI implements InterfaceClientRMI, Serializable {
 
 	public static void main(String args[]) {
 		String a;
-
+		int menuOption;
+		Scanner scan = new Scanner(System.in);
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
 		System.out.println("======================ADMIN CONSOLE!======================");
@@ -41,11 +43,24 @@ public class ClientRMI implements InterfaceClientRMI, Serializable {
 			h.saveClients(args[0], (InterfaceClientRMI) client);
 
 			while (true) {
-				/*
-				System.out.print("> ");
+
+				menuOption = scan.nextInt();
+
+				switch(menuOption){
+					case 1:
+						Pessoa pessoa = new Pessoa();
+						pessoa.RegisterPerson();
+						System.out.println(pessoa.nome);
+						System.out.println(pessoa.nome);
+						System.out.println(pessoa.toString());
+						break;
+				}
+
+
+				/*System.out.print("> ");
 				a = reader.readLine();
-				h.print_on_server(a);
-				*/
+				h.print_on_server(a);*/
+
 				/*
 				scanf (nome);
 				h.SaveRegistry(nome, idade);
