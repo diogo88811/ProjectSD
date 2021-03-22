@@ -23,7 +23,8 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		super();
 	}
 
-	public void SaveRegistry(String string) throws RemoteException {
+	public void SaveRegistry(Pessoa pessoa) throws RemoteException {
+
 
 		File arquivo = new File("teste.txt");
 		try {
@@ -34,25 +35,16 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ObjectOutputStream bw = new ObjectOutputStream(fw);
 
 			// type | register ; username | pierre ; password | omidyar ; job | estudante ; tele | 913613099 ; adress | Seia ; CCNumber | 123 ; CCVal | 12/05/2023 ; Depart | UC ;
-			String[] arrOfStr = string.split("\\|");
-			String[] Strings = Arrays.copyOfRange(arrOfStr, 2, arrOfStr.length);
-			ArrayList<String> person = new ArrayList<String>();
-			for (String aux : Strings) {
-				String[] temp = aux.split(";");
-				person.add(temp[0]);
-			}
-			Pessoa pessoa = new Pessoa(person.get(0), person.get(1), person.get(2), person.get(3), person.get(4),
-					person.get(5), person.get(6), person.get(7));
 
-			if((person.get(7).toUpperCase()).equals("ESTUDANTE")){
+			if(pessoa.getDepartamento().toUpperCase().equals("ESTUDANTE")){
 				Estudantes.add(pessoa);
 			
 			}
-			else if((person.get(7).toUpperCase()).equals("DOCENTE")){
+			else if(pessoa.getDepartamento().toUpperCase().equals("DOCENTE")){
 				Docentes.add(pessoa);
 			
 			}
-			else if((person.get(7).toUpperCase()).equals("FUNCIONARIO")){
+			else if(pessoa.getDepartamento().toUpperCase().equals("FUNCIONARIO")){
 				Funcionarios.add(pessoa);
 			}
 
@@ -60,7 +52,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			bw.close();
 			fw.close();
 			System.out.println("SUCCESSFULLY REGISTERED !");
-			// ESTAMOS A EXPERIMENTAR O GIT HUBIS IN THE PIDINGINGS NIGHTINGS
 
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");

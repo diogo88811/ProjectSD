@@ -1,4 +1,7 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Scanner;
 
 public class Eleicao implements Serializable {
 
@@ -9,6 +12,11 @@ public class Eleicao implements Serializable {
         this.DataInicio = DataInicio;
         this.DataFim = DataFim;
         this.publicoAlvo = publicoAlvo;
+    }
+
+
+    public  Eleicao(){
+
     }
 
     public String getNome() {
@@ -50,5 +58,13 @@ public class Eleicao implements Serializable {
                "\nDATA FIM: "        + DataFim      + 
                "\nPUBLICO ALVO: "    + publicoAlvo  ;
        }
+
+    public void createEleicao(){
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+        Scanner scan = new Scanner(System.in);
+
+        System.out.println("hello here");
+    }
     
 }

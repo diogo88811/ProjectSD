@@ -50,16 +50,19 @@ public class ClientRMI implements InterfaceClientRMI, Serializable {
 					case 1:
 						Pessoa pessoa = new Pessoa();
 						pessoa.RegisterPerson();
-						System.out.println(pessoa.nome);
-						System.out.println(pessoa.nome);
-						System.out.println(pessoa.toString());
+						//System.out.println(pessoa.toString());
+						h.SaveRegistry(pessoa);
+						break;
+					case 2:
+						Eleicao eleicao  = new Eleicao();
+						eleicao.createEleicao();
 						break;
 				}
 
 
-				/*System.out.print("> ");
+				System.out.print("> ");
 				a = reader.readLine();
-				h.print_on_server(a);*/
+				h.print_on_server(a);
 
 				/*
 				scanf (nome);
