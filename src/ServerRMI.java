@@ -27,8 +27,22 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		super();
 	}
 
+	public ArrayList<Pessoa> getEstudantes() throws RemoteException{
+		return this.Estudantes;
+	}
+	public ArrayList<Pessoa> getDocentes() throws RemoteException{
+		return this.Docentes;
+	}
+	public ArrayList<Pessoa> getFuncionarios() throws RemoteException{
+		return this.Funcionarios;
+	}
+	public ArrayList<Eleicao> getEleicoes() throws RemoteException{
+		return this.eleicoes;
+	}
+	public ArrayList<InterfaceClientRMI> getClients() throws RemoteException{
+		return this.clients;
+	}
 	public void SaveRegistry(Pessoa pessoa) throws RemoteException {
-
 
 		File arquivo = new File("teste.txt");
 		try {
@@ -64,7 +78,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		}
 		return;
 	}
-
 	public void criarEleicao(String string) throws RemoteException {
 
 		File arquivo = new File("teste.txt");
@@ -85,7 +98,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 				String[] temp = aux.split(";");
 				arrayEleicao.add(temp[0]);
 			}
-			Eleicao eleicao = new Eleicao(arrayEleicao.get(0), arrayEleicao.get(1), arrayEleicao.get(2), arrayEleicao.get(3));
+			Eleicao eleicao = new Eleicao(arrayEleicao.get(0), arrayEleicao.get(1), arrayEleicao.get(2), arrayEleicao.get(3), true);
 			eleicoes.add(eleicao);
 			bw.writeObject(eleicao);
 			bw.close();
@@ -96,12 +109,10 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ex.printStackTrace();
 		}
 	}
-
 	public void saveClients(String name, InterfaceClientRMI a) throws RemoteException{
-		System.out.println("Subscribing " + name);
+		System.out.println("CONNECTED WITH " + name);
 		clients.add(a);
-	}
-	
+	}	
 	public void print_on_server(String s) throws RemoteException {
 		System.out.println("> " + s);
 	}
@@ -116,6 +127,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ServerRMI h = new ServerRMI();
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			System.out.println("======================RMI SERVER READY!======================");
 			
 			while(true){

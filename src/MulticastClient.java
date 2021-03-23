@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class MulticastClient extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
+    private int PORT = 7000;
 
     public static void main(String[] args) {
         MulticastClient client = new MulticastClient();

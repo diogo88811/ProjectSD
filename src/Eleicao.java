@@ -5,13 +5,19 @@ import java.util.Scanner;
 
 public class Eleicao implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     public String nome, DataInicio, DataFim, publicoAlvo;
+    boolean estado;
     
-    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo){
+    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, boolean estado){
         this.nome = nome;
         this.DataInicio = DataInicio;
         this.DataFim = DataFim;
         this.publicoAlvo = publicoAlvo;
+        this.estado = estado;
     }
 
 
@@ -35,6 +41,10 @@ public class Eleicao implements Serializable {
         this.DataInicio = DataInicio;
     }
 
+    public boolean getEstado(){
+        return this.estado;
+    }
+
     public String getDataFim() {
         return this.DataFim;
     }
@@ -56,7 +66,8 @@ public class Eleicao implements Serializable {
         return "NOME: "              + nome         + 
                "\nDATA INICIO: "     + DataInicio   + 
                "\nDATA FIM: "        + DataFim      + 
-               "\nPUBLICO ALVO: "    + publicoAlvo  ;
+               "\nPUBLICO ALVO: "    + publicoAlvo  +
+               "\nESTADO: "          + estado       ;
        }
 
     public void createEleicao(){

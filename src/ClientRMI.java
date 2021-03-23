@@ -34,6 +34,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 		Scanner scan = new Scanner(System.in);
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
+		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		System.out.println("======================ADMIN CONSOLE!======================");
 		System.out.println("1. Registar pessoas");
 		System.out.println("2. Criar Eleicao");
