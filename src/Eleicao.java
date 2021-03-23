@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Scanner;
@@ -70,12 +71,27 @@ public class Eleicao implements Serializable {
                "\nESTADO: "          + estado       ;
        }
 
-    public void createEleicao(){
+    public void createEleicao() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         Scanner scan = new Scanner(System.in);
+        String in;
+        System.out.println("Insira nome da eleição");
+        in = reader.readLine();
+        this.nome = in;
+        System.out.println("Insira data de inicio dd/mm/aaaa");
+        in = reader.readLine();
+        this.DataInicio = in;
+        System.out.println("Insira data de fim dd/mm/aaaa");
+        in = reader.readLine();
+        this.DataFim = in;
 
-        System.out.println("hello here");
+        System.out.println("Insira publico alvo");
+        in = reader.readLine();
+        this.publicoAlvo = in;
+
+        this.estado = true;
+
     }
     
 }

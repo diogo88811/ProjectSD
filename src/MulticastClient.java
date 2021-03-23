@@ -10,8 +10,8 @@ public class MulticastClient extends Thread {
     public static void main(String[] args) {
         MulticastClient client = new MulticastClient();
         client.start();
-        MulticastUser user = new MulticastUser();
-        user.start();
+        //MulticastUser user = new MulticastUser();
+        //user.start();
     }
 
     public void run() {

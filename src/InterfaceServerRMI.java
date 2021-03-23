@@ -4,7 +4,7 @@ import java.rmi.Remote;
 
 public interface InterfaceServerRMI extends Remote{
     public void SaveRegistry(Pessoa string) throws RemoteException;
-    public void criarEleicao(String string) throws RemoteException;
+    public void criarEleicao(Eleicao eleicao) throws RemoteException;
 	public void saveClients(String name, InterfaceClientRMI a) throws RemoteException;
     public void print_on_server(String s) throws RemoteException;
     public ArrayList<Pessoa> getEstudantes() throws RemoteException;

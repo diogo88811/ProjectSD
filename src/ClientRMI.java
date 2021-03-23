@@ -59,14 +59,16 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 					case 2:
 						Eleicao eleicao  = new Eleicao();
 						eleicao.createEleicao();
+						System.out.println(eleicao.toString());
+						h.criarEleicao(eleicao);
 						break;
 				}
 
-
+				/*
 				System.out.print("> ");
 				a = reader.readLine();
 				h.print_on_server(a);
-
+				*/
 				/*
 				scanf (nome);
 				h.SaveRegistry(nome, idade);

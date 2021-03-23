@@ -78,7 +78,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		}
 		return;
 	}
-	public void criarEleicao(String string) throws RemoteException {
+	public void criarEleicao(Eleicao eleicao) throws RemoteException {
 
 		File arquivo = new File("teste.txt");
 		try {
@@ -90,15 +90,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ObjectOutputStream bw = new ObjectOutputStream(fw);
 
 			// type | eleicao ; nome | Lista A ; dataInicio | 12/04/2021 13:30 ; dataFim | 12/04/2021 18:30 ; publicoAlvo | estudantes ;
-
-			String[] arrOfStr = string.split("\\|");
-			String[] Strings = Arrays.copyOfRange(arrOfStr, 2, arrOfStr.length);
-			ArrayList<String> arrayEleicao = new ArrayList<String>();
-			for (String aux : Strings) {
-				String[] temp = aux.split(";");
-				arrayEleicao.add(temp[0]);
-			}
-			Eleicao eleicao = new Eleicao(arrayEleicao.get(0), arrayEleicao.get(1), arrayEleicao.get(2), arrayEleicao.get(3), true);
 			eleicoes.add(eleicao);
 			bw.writeObject(eleicao);
 			bw.close();
