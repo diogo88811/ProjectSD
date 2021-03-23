@@ -26,7 +26,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	public ServerRMI() throws RemoteException {
 		super();
 	}
-
 	public ArrayList<Pessoa> getEstudantes() throws RemoteException{
 		return this.Estudantes;
 	}
