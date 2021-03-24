@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI{
@@ -58,10 +59,26 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						break;
 					case 2:
 						Eleicao eleicao  = new Eleicao();
-						eleicao.createEleicao();
-						System.out.println(eleicao.toString());
+						eleicao.createEleicao(h.getEstudantes());
 						h.criarEleicao(eleicao);
 						break;
+					case 3:
+						ArrayList<Eleicao> election = h.getEleicoes();
+						System.out.println("Selecione a eleicao: ");
+						for(int i = 0; i < election.size(); i++){
+							System.out.println(i+": "+""+election.get(i).getNome());
+						}
+						int listnum = scan.nextInt();
+						ArrayList<Lista> li = election.get(listnum).getListas();
+						if(li == null){
+							System.out.println("Não há listas, tem de adicionar:");
+
+						}
+						else{
+							System.out.println(li.get(0).getCandidatoPrincipal().nome);
+						}
+						break;
+
 				}
 
 				/*

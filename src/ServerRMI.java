@@ -53,15 +53,15 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 			// type | register ; username | pierre ; password | omidyar ; job | estudante ; tele | 913613099 ; adress | Seia ; CCNumber | 123 ; CCVal | 12/05/2023 ; Depart | UC ;
 
-			if(pessoa.getDepartamento().toUpperCase().equals("ESTUDANTE")){
+			if(pessoa.getTrabalho().toUpperCase().equals("ESTUDANTE")){
 				Estudantes.add(pessoa);
 			
 			}
-			else if(pessoa.getDepartamento().toUpperCase().equals("DOCENTE")){
+			else if(pessoa.getTrabalho().toUpperCase().equals("DOCENTE")){
 				Docentes.add(pessoa);
 			
 			}
-			else if(pessoa.getDepartamento().toUpperCase().equals("FUNCIONARIO")){
+			else if(pessoa.getTrabalho().toUpperCase().equals("FUNCIONARIO")){
 				Funcionarios.add(pessoa);
 			}
 
