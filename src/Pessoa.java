@@ -9,7 +9,6 @@ import java.util.Scanner;
 public class Pessoa implements Serializable {
     public String nome, password, trabalho, departamento, telemovel, morada, CCnumber, CCVal;
 
-
     public Pessoa(String nome, String password, String job, String telemovel, String morada, String CCnumber, String CCVal, String departamento){
         this.nome = nome;
         this.password = password;
