@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Eleicao implements Serializable {
@@ -12,13 +13,15 @@ public class Eleicao implements Serializable {
     private static final long serialVersionUID = 1L;
     public String nome, DataInicio, DataFim, publicoAlvo;
     boolean estado;
+    public ArrayList<Lista> listas = new ArrayList<Lista>();
     
-    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, boolean estado){
+    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, boolean estado,ArrayList<Lista> listas){
         this.nome = nome;
         this.DataInicio = DataInicio;
         this.DataFim = DataFim;
         this.publicoAlvo = publicoAlvo;
         this.estado = estado;
+        this.listas = listas;
     }
 
 
@@ -63,15 +66,27 @@ public class Eleicao implements Serializable {
     }
 
 
-    public String toString(){//overriding the toString() method  
-        return "NOME: "              + nome         + 
-               "\nDATA INICIO: "     + DataInicio   + 
-               "\nDATA FIM: "        + DataFim      + 
-               "\nPUBLICO ALVO: "    + publicoAlvo  +
-               "\nESTADO: "          + estado       ;
-       }
+    public ArrayList<Lista> getListas() {
+        return listas;
+    }
 
-    public void createEleicao() throws IOException {
+    public void setListas(ArrayList<Lista> listas) {
+        this.listas = listas;
+    }
+
+    @Override
+    public String toString() {
+        return "Eleicao{" +
+                "nome='" + nome + '\'' +
+                ", DataInicio='" + DataInicio + '\'' +
+                ", DataFim='" + DataFim + '\'' +
+                ", publicoAlvo='" + publicoAlvo + '\'' +
+                ", estado=" + estado +
+                ", listas=" + listas +
+                '}';
+    }
+
+    public void createEleicao(ArrayList<Pessoa> pessoa) throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         Scanner scan = new Scanner(System.in);
@@ -90,6 +105,9 @@ public class Eleicao implements Serializable {
         in = reader.readLine();
         this.publicoAlvo = in;
 
+        Lista l = new Lista();
+        l.setCandidatoPrincipal(pessoa.get(0));
+        this.listas.add(l);
         this.estado = true;
 
     }
