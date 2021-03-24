@@ -10,15 +10,15 @@ import java.util.Scanner;
 public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 7000;
-    
 
-    
+
+
     public MulticastServer() {
         super("User " + (long) (Math.random() * 1000));
     }
 
     public void sendData() throws IOException{
-        MulticastSocket socket = new MulticastSocket(); 
+        MulticastSocket socket = new MulticastSocket();
         Scanner keyboardScanner = new Scanner(System.in);
         String readKeyboard = keyboardScanner.nextLine();
         byte[] buffer = readKeyboard.getBytes();
@@ -44,7 +44,7 @@ public class MulticastServer extends Thread {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             while (true) {
-                
+
                 // type | login ; username | pierre ; password | omidyar 
                 aux = br.readLine();
                 if(aux.equals("login")){
@@ -62,7 +62,7 @@ public class MulticastServer extends Thread {
         MulticastUser user = new MulticastUser();
         user.start();
     }
-} 
+}
 
 
 class MulticastUser extends Thread {
