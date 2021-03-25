@@ -48,8 +48,9 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 	private static void loadData(ServerRMI h) {
 
-		try (FileInputStream fis = new FileInputStream("eleicao.dat");
-			 ObjectInputStream ois = new ObjectInputStream(fis)) {
+		try {
+			FileInputStream fis = new FileInputStream("eleicao.dat");
+			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			// read object from file7
 			Eleicao ele = new Eleicao();
@@ -62,8 +63,9 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ex.printStackTrace();
 		}
 
-		try (FileInputStream fis = new FileInputStream("Pessoas.dat");
-			 ObjectInputStream ois = new ObjectInputStream(fis)) {
+		try {
+			FileInputStream fis = new FileInputStream("Pessoas.dat");
+			 ObjectInputStream ois = new ObjectInputStream(fis) ;
 
 			// read object from file7
 			Pessoa ele = new Pessoa();
