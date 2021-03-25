@@ -1,5 +1,4 @@
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.BufferedReader;
@@ -8,91 +7,85 @@ import java.io.InputStreamReader;
 import java.util.Scanner;
 
 
+
 public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 7000;
     Scanner keyboardScanner = new Scanner(System.in);
+    String a;
 
     public MulticastServer() {
-        super("User " + (long) (Math.random() * 1000));
+        super("SERVER " + (long) (Math.random() * 1000));
     }
 
-    public void sendData(MulticastSocket socket, InetAddress group) throws IOException{
-        String readKeyboard = keyboardScanner.nextLine();
-        byte[] buffer = readKeyboard.getBytes();
+    public String receiveData(MulticastSocket socket) throws IOException{
 
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-        socket.send(packet);
-    }
-
-    public String receiveData(MulticastSocket socket, InetAddress group) throws IOException{
         byte[] buffer = new byte[256];
-
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        socket.receive(packet);
-
-        String message = new String(packet.getData(), 0, packet.getLength());
-
-        return message;
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            socket.receive(packet);
+            String message = new String(packet.getData(), 0, packet.getLength());
+            System.out.println(message);
+            return message;
     }
-
+    
     public void run() {
         MulticastSocket socket = null;
+      
         try {
-            socket = new MulticastSocket();
+            System.out.println("================================< " + this.getName() + " >=========================================");
+            
+            socket = new MulticastSocket(PORT);  
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
+
             while (true) {
-
-                // type | login ; username | pierre ; password | omidyar
-                receiveData(socket, group);
-
-            }
+                a = receiveData(socket);
+            } 
         } catch (IOException e) { e.printStackTrace();}
     }
-    public static void main(String[] args) throws IOException {
-        Scanner keyboardScanner = new Scanner(System.in);
 
+    public static void main(String[] args) throws IOException {
         MulticastServer server = new MulticastServer();
         server.start();
         MulticastUser user = new MulticastUser();
         user.start();
-
     }
 }
-
 
 class MulticastUser extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.1";
     private int PORT = 7000;
+    InputStreamReader input = new InputStreamReader(System.in);
+    BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
-
 
     public MulticastUser() {
         super("SERVER " + (long) (Math.random() * 1000));
     }
 
-    void sendData(MulticastSocket socket) throws IOException{
-        String readKeyboard = keyboardScanner.nextLine();
-        byte[] buffer = readKeyboard.getBytes();
+    public void sendData(MulticastSocket socket, String data) throws IOException{
+        byte[] buffer = data.getBytes();
         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-
         socket.send(packet);
     }
 
     public void run() {
         MulticastSocket socket = null;
-        System.out.println("================================< " + this.getName() + " >=========================================");
         try {
-            socket = new MulticastSocket();  // create socket without binding it (only for sending)
+            socket = new MulticastSocket();  
             while (true) {
-                sendData(socket);
+                String data = reader.readLine();
+                if(data.equals("login")){
+                    System.out.println("\n\n");
+                    System.out.print("Introduz o nome:");
+                }
+                sendData(socket, data);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             socket.close();
         }
-    }
+    }   
 }
