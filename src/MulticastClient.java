@@ -1,7 +1,5 @@
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
-import java.util.Vector;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
@@ -11,8 +9,11 @@ public class MulticastClient extends Thread {
     
     private static MulticastUserClient user;
     private static MulticastClient client;
-
+    private static MulticastServer server;
+    Terminal terminal;
+    private boolean state = true;
     private int PORT = 7000;
+    int flag = 0;
     
     public MulticastClient() {
         super("CLIENT " + (long) (Math.random() * 1000));
@@ -26,28 +27,38 @@ public class MulticastClient extends Thread {
         
         return message;
     }
-
-    
-    public String sendData(MulticastSocket socket, String msg) throws IOException{
-        Scanner keyboardScanner = new Scanner(System.in);
-
-        String a = keyboardScanner.nextLine();
-        String aux = msg + a;
-
-        byte[] buffer = aux.getBytes();
-
-        InetAddress group = InetAddress.getByName("224.0.224.1");
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-        socket.send(packet);
-
-        return aux;
-    }
+   
     public void analyzeData(MulticastSocket socket, String data) throws IOException, InterruptedException{
-        Scanner keyboardScanner = new Scanner(System.in);
+        if(state == true){
+            String[] aux = data.split("[ ]");
+            String terminal = aux[4] + " " + aux[5];
+            if(aux[0].equals("Miguel")){
+                if(user.getName().equals(terminal)){
+                    state = false;
+                    System.out.print("PASSWORD: ");
+                    user.sendData(socket, "type | login ; username | " + aux[0] + " ; password | ", true);    
+                }   
+            }   
+        }else{
+            user.sendData(socket, "TERMINAL OCUPIED !", false);    
+        }       
+    }
 
-        if(data.equals("Miguel")){
-            System.out.print("PASSWORD: ");
-            user.sendData(socket, "type | login ; username | " + data + " ; password | ");           
+    public boolean getClientState() {
+        return this.state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+
+    private void verifyClient(MulticastSocket socket) throws IOException {
+        if(flag == 0){
+            if(getClientState() == true){
+                String aux = "TERMINAL " + user.getName() + " AVAILABLE !" ;
+                user.sendData(socket, aux, false);
+                flag = 1;
+            }            
         }
     }
 
@@ -59,8 +70,10 @@ public class MulticastClient extends Thread {
             socket.joinGroup(group);
             String data;
             while (true) {
+                verifyClient(socket);
                 data = receiveData(socket);
                 analyzeData(socket, data);
+                //System.out.println(newTerminal.getTerminals().get(0).getId());
             } 
         }catch (IOException e) { e.printStackTrace();} catch (InterruptedException e) { e.printStackTrace();}
     }
@@ -76,33 +89,38 @@ public class MulticastClient extends Thread {
 class MulticastUserClient extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 7000;
-    boolean stateTerminal = true;
 
 
     public MulticastUserClient() {
         super("CLIENT " + (long) (Math.random() * 1000));
     }
 
-    public String sendData(MulticastSocket socket, String msg) throws IOException{
+    public String sendData(MulticastSocket socket, String msg, boolean premission) throws IOException{
         Scanner keyboardScanner = new Scanner(System.in);
+        
+        if(premission == true){
+            String a = keyboardScanner.nextLine();
+            String aux = msg + a;
 
-        String a = keyboardScanner.nextLine();
-        String aux = msg + a;
-        byte[] buffer = aux.getBytes();
+            byte[] buffer = aux.getBytes();
 
-        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-        socket.send(packet);
+            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+            socket.send(packet);
 
-        return aux;
-    }
+            return aux;
+        }
+        else{
+            String aux = msg ;
 
-    public boolean getStateTerminal() {
-        return this.stateTerminal;
-    }
+            byte[] buffer = aux.getBytes();
 
-    public void setStateTerminal(boolean stateTerminal) {
-        this.stateTerminal = stateTerminal;
+            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+            socket.send(packet);
+
+            return aux;
+        }
     }
 
     public String getNome(){
