@@ -5,81 +5,65 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
-class Terminal {
-    private String id;
-    private boolean state;
-    private ArrayList<Terminal> terminals = new ArrayList<Terminal>();
+class Data{
+    private volatile String id;
+    private volatile boolean state;
 
-    public Terminal(String id, boolean state) {
+    public synchronized void setID(String id){
         this.id = id;
+    }
+    public synchronized void setState(boolean state){
         this.state = state;
     }
-    public Terminal(){
-
-    }
-    public String getId() {
-        return this.id;
-    }
-    public boolean getState() {
+    public synchronized boolean getState(){
         return this.state;
     }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public void setState(boolean state) {
-        this.state = state;
-    }
-    public boolean addTerminal( Terminal newTerminal ) {
-        terminals.add( newTerminal );
-        return true;
-    }
-    public ArrayList<Terminal> getTerminals(){
-        return this.terminals;
+    public synchronized String getID(){
+        return this.id;
     }
 }
 
 public class MulticastServer extends Thread {
+
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 7000;
     private static MulticastServer server;
     private static MulticastUser user;
-    Terminal terminal;
     Scanner keyboardScanner = new Scanner(System.in);
     String a;
+    int number = 0;
+    int id = 0;
+    HashMap<String, String> info = new HashMap<String, String>();
 
-    public MulticastServer(Terminal terminal) {
+
+    public MulticastServer(ArrayList<Data> data) {
         super("SERVER " + (long) (Math.random() * 1000));
-        this.terminal = terminal;
-
     }
 
     public String receiveData(MulticastSocket socket) throws IOException{
-
         byte[] buffer = new byte[256];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            socket.receive(packet);
-            String message = new String(packet.getData(), 0, packet.getLength());
-            System.out.println(message);
-            return message;
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        socket.receive(packet);
+        String message = new String(packet.getData(), 0, packet.getLength());
+//        System.out.println(message);
+        return message;
     }
     
-    public void checkTerminal(String terminalID){
-        String[] token = terminalID.split("[ ]");
-        if(token[1] != null && token[2] != null){
-            String terminalName = token[1] + " " + token[2];
-            if(token[0]!= null && token[3] != null){
-                if(token[0].equals("TERMINAL") && token[3].equals("AVAILABLE")){
-                    terminal.addTerminal(new Terminal(terminalName, true));
-                }
-            }
+    public void analyseData(String data){
+
+        String aux[] = data.split("[;]");
+        for(String a : aux){
+            String types[] = a.split("\\|");
+            info.put(types[0].trim(), types[1].trim());
         }
     }
 
+
     public void run() {
         MulticastSocket socket = null;
-      
         try {
             System.out.println("================================< " + this.getName() + " >=========================================");
             
@@ -87,18 +71,32 @@ public class MulticastServer extends Thread {
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
 
-            while (true) {
+            while (true) {                
                 a = receiveData(socket);
-                checkTerminal(a);
+                analyseData(a);
+
+                if(info.get("type").equals("login")){
+                    user.sendData(socket, "type | request ; username | " + info.get("username") + " ; NumberRequest | " + number );
+                }
+                else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
+                    user.sendData(socket, "type | reserve ; terminalID | " + info.get("IDclient") + " ; NumberRequest | " + number + " ; username | " + info.get("username"));
+                    number++;
+                }
+                else if(info.get("type").equals("reserved")){
+                    System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
+                }
+                else if(info.get("type").equals("authentication")){
+                    //VERIFICA DADOS NO RMI
+                }
             } 
         } catch (IOException e) { e.printStackTrace();}
     }
 
     public static void main(String[] args) throws IOException {
-        Terminal terminal = new Terminal();
-        server = new MulticastServer(terminal);
+        ArrayList<Data> data = new ArrayList<Data>();
+        server = new MulticastServer(data);
         server.start();
-        user = new MulticastUser(terminal);
+        user = new MulticastUser(data);
         user.start();
     }
 }
@@ -106,64 +104,53 @@ public class MulticastServer extends Thread {
 class MulticastUser extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.1";
     private int PORT = 7000;
-    private static MulticastServer server;
-    Terminal terminal;
+    ArrayList<Data> data;
+    MulticastServer server;
 
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastUser(Terminal terminal) {
+    public MulticastUser( ArrayList<Data> data) {
         super("SERVER " + (long) (Math.random() * 1000));
-        this.terminal = terminal;
+        this.data = data;
     }
 
     public void sendData(MulticastSocket socket, String data) throws IOException{
-        String name = choseTerminal();
-        String aux = data + " " + name + " " ;
-        System.out.println(aux);
+        String aux = data + " " ;
         byte[] buffer = aux.getBytes();
         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
     }
-
-    public String choseTerminal(){
-        int k = 0;
-        int f = 0;
-        if(terminal.getTerminals().size() != 0){        
-            while(k < terminal.getTerminals().size()){
-                if(terminal.getTerminals().get(k).getState() == true){
-                    terminal.getTerminals().get(k).setState(false);
-                    f = k;
-                    break;
-                }
-                k++;
-            }
-            return "GO TO TERMINAL " + terminal.getTerminals().get(f).getId() + " TO VOTE !" ;
-        }
-        else{
-            return "";
-        }
-    }
     
+    public void sendToServer(MulticastSocket socket, String data) throws IOException{
+        String aux = data + " " ;
+        //System.out.println(aux);
+        byte[] buffer = aux.getBytes();
+        InetAddress group = InetAddress.getByName("224.0.224.0");
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+        socket.send(packet);
+    }
+  
     public void run() {
         MulticastSocket socket = null;
         try {
             socket = new MulticastSocket();  
+            System.out.println("1.LOGIN");
             while (true) {
-                String data = reader.readLine();
-                if(data.equals("login")){
+                String teste = reader.readLine();
+                if(teste.equals("1")){
                     System.out.print("NAME: ");
                     String aux = reader.readLine();
-                    sendData(socket, aux);  
+                    sendToServer(socket, "type | login ; username | " + aux );  
                 }
-                
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }  finally {
             socket.close();
         }
+        
     }   
 }
