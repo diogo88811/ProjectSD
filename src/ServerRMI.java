@@ -1,10 +1,15 @@
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
 
 public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI {
 	/**
@@ -157,19 +162,54 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws IOException, InterruptedException {
 		String a;
-
+		DatagramSocket aSocket = null;
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
 
+		while(true){
+			try{
+
+				aSocket = new DatagramSocket();
+				System.out.println("ping");
+				InetAddress host = InetAddress.getByName("127.0.0.1");
+				int serverPort = 6789;
+				byte[] buffer = new byte[1000];
+				DatagramPacket request = new DatagramPacket(buffer,buffer.length,host,serverPort);
+				aSocket.send(request);
+
+				aSocket.setSoTimeout(2000);
+
+				byte[] buff = new byte[1000];
+				DatagramPacket reply = new DatagramPacket(buff,buff.length,host,serverPort);
+				aSocket.receive(reply);
+				System.out.println("recebido");
+				Thread.sleep(2000);
+
+
+			} catch (InterruptedException e){
+				e.printStackTrace();
+			} catch (UnknownHostException e){
+				e.printStackTrace();
+			} catch (SocketException e){
+				e.printStackTrace();
+			} catch (IOException e){
+				System.out.println("Não encontrou o server");
+				break;
+			}
+		}
+
+
+		NewThread t = new NewThread();
+		t.start();
 
 		try {
 			ServerRMI h = new ServerRMI();
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
 
-			loadData(h);
+			//loadData(h);
 
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			System.out.println("======================RMI SERVER READY!======================");
@@ -183,4 +223,36 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			System.out.println("Exception in HelloImpl.main: " + re);
 		}
 	}
+}
+class NewThread extends Thread {
+
+	public void run() {      // entry point
+
+		DatagramSocket aSocket = null;
+		int serverPort = 6789;
+		InetAddress host = null;
+		try {
+			aSocket = new DatagramSocket(6789);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		while (true) {
+			System.out.println("ping");
+
+			byte[] buffer = new byte[1000];
+			DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+			try {
+				aSocket.receive(request);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			byte[] buff = new byte[1000];
+			DatagramPacket reply = new DatagramPacket(request.getData(), request.getLength(), request.getAddress(), request.getPort());
+			try {
+				aSocket.send(reply);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}}
 }
