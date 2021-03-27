@@ -58,7 +58,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			// read object from file7
-			Eleicao ele = new Eleicao();
+			Eleicao ele ;
 			while((ele = (Eleicao) ois.readObject()) != null){
 				h.eleicoes.add(ele);
 			}
@@ -73,7 +73,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			 ObjectInputStream ois = new ObjectInputStream(fis) ;
 
 			// read object from file7
-			Pessoa ele = new Pessoa();
+			Pessoa ele ;
 			while((ele = (Pessoa) ois.readObject()) != null){
 				h.person.add(ele);
 			}
@@ -162,6 +162,10 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
+	public void verifyUser(String nome, String ccNumber, String password){
+		//verifica se o user está bem
+	}
+
 	public static void main(String args[]) throws IOException, InterruptedException {
 		String a;
 		DatagramSocket aSocket = null;
@@ -209,7 +213,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
 
-			//loadData(h);
+			loadData(h);
 
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			System.out.println("======================RMI SERVER READY!======================");
@@ -237,7 +241,6 @@ class NewThread extends Thread {
 			e.printStackTrace();
 		}
 		while (true) {
-			System.out.println("ping");
 
 			byte[] buffer = new byte[1000];
 			DatagramPacket request = new DatagramPacket(buffer, buffer.length);

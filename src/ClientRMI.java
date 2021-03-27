@@ -63,7 +63,14 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						h.criarEleicao(eleicao);
 						break;
 					case 3:
-						ArrayList<Eleicao> election = h.getEleicoes();
+						ArrayList<Eleicao> election;
+						try{
+							election = h.getEleicoes();
+						}
+						catch (Exception e){
+							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							election = h.getEleicoes();
+						}
 						System.out.println("Selecione a eleicao: ");
 						for(int i = 0; i < election.size(); i++){
 							System.out.println(i+": "+""+election.get(i).getNome());
