@@ -1,6 +1,7 @@
 import java.net.MulticastSocket;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.BufferedReader;
@@ -17,6 +18,7 @@ public class MulticastClient extends Thread {
     HashMap<String, String> info = new HashMap<String, String>();
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
+    String name;
 
     
     public MulticastClient() {
@@ -48,10 +50,10 @@ public class MulticastClient extends Thread {
                 user.sendData(socket, "type | reserved ; IDclient | " + user.getName(), false);
                 state = false;
                 System.out.print("CCNUMBER: ");
-                String name = reader.readLine();
-                System.out.print("PASSWORD: ");
-                String password = reader.readLine();
-                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
+                while((name = reader.readLine()) == null){
+                    System.out.print("PASSWORD: ");
+                    String password = reader.readLine();
+                    user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
             }
         }  
         if(info.get("type").equals("vote")){

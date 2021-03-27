@@ -19,7 +19,7 @@ public class MulticastServer extends Thread {
     private static MulticastServer server;
     private static MulticastUser user;
     Scanner keyboardScanner = new Scanner(System.in);
-    String a;
+    String dataReceived;
     int number = 0;
     int id = 0;
     HashMap<String, String> info = new HashMap<String, String>();
@@ -37,12 +37,28 @@ public class MulticastServer extends Thread {
         return message;
     }
     
-    public void analyseData(String data){
+    public void analyseData(MulticastSocket socket, String data/*, InterfaceServerRMI h*/) throws IOException{
 
         String aux[] = data.split("[;]");
         for(String a : aux){
             String types[] = a.split("\\|");
             info.put(types[0].trim(), types[1].trim());
+        }
+
+        if(info.get("type").equals("login")){
+            user.sendData(socket, "type | request ; username | " + info.get("username") + " ; NumberRequest | " + number );
+        }
+        else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
+            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
+            number++;
+        }
+        else if(info.get("type").equals("reserved")){
+            System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
+        }
+        else if(info.get("type").equals("authentication")){
+//            if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
+                user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
+//           }
         }
     }
 
@@ -51,45 +67,25 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null;
         try {
             System.out.println("================================< " + this.getName() + " >=========================================");
-            InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
-            ClientRMI client = new ClientRMI(this.getName());
-            h.saveClients(this.getName(), (InterfaceClientRMI) client);
+           // InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+            //ClientRMI client = new ClientRMI(this.getName());
+            //h.saveClients(this.getName(), (InterfaceClientRMI) client);
             
             socket = new MulticastSocket(PORT);  
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
 
             while (true) {                
-                a = receiveData(socket);
-                analyseData(a);
-
-                if(info.get("type").equals("login")){
-                    user.sendData(socket, "type | request ; username | " + info.get("username") + " ; NumberRequest | " + number );
-                }
-                else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
-                    user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
-                    number++;
-                }
-                else if(info.get("type").equals("reserved")){
-                    System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
-                }
-                else if(info.get("type").equals("authentication")){
-                    //VERIFICA DADOS NO RMI
-                    //if dados verificados com sucesso
-                  //  h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD"));
-                    user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
-                }
+                dataReceived = receiveData(socket);
+                analyseData(socket, dataReceived/*, h*/);
             } 
-        } catch (IOException e) { e.printStackTrace();} catch (NotBoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace();} //catch (NotBoundException e) {e.printStackTrace();}
     }
 
     public static void main(String[] args) throws IOException {
-        server = new MulticastServer();
+        server = new MulticastServer();  //THREAD RECEBE
         server.start();
-        user = new MulticastUser();
+        user = new MulticastUser();  //THREAD ENVIA
         user.start();
     }
 }
@@ -129,7 +125,6 @@ class MulticastUser extends Thread {
         MulticastSocket socket = null;
         try {
             socket = new MulticastSocket();  
-
             while (true) {
                 if(verify == false){
                     System.out.println("IDENTIFICA O DEPARTEMENTO DA MESA :");
@@ -154,6 +149,5 @@ class MulticastUser extends Thread {
         }  finally {
             socket.close();
         }
-        
     }   
 }
