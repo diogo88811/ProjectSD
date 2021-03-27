@@ -54,6 +54,14 @@ public class MulticastClient extends Thread {
                 user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
             }
         }  
+        if(info.get("type").equals("vote")){
+            if(info.get("userData").equals("valid")){
+                //vai buscar lista ao RMI
+                //vota
+                String vote = "";
+                user.sendData(socket, "type | voteComplete ; username | " + info.get("username") + " ; vote | " + vote , false);
+            }
+        }
     }
 
     public void run() {
