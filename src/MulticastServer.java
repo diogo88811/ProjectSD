@@ -37,7 +37,7 @@ public class MulticastServer extends Thread {
         return message;
     }
     
-    public void analyseData(MulticastSocket socket, String data/*, InterfaceServerRMI h*/) throws IOException{
+    public void analyseData(MulticastSocket socket, String data, InterfaceServerRMI h) throws IOException{
 
         String aux[] = data.split("[;]");
         for(String a : aux){
@@ -56,9 +56,9 @@ public class MulticastServer extends Thread {
             System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
         }
         else if(info.get("type").equals("authentication")){
-//            if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
-                user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
-//           }
+            if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
+                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
+            }
         }
     }
 
@@ -67,9 +67,9 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null;
         try {
             System.out.println("================================< " + this.getName() + " >=========================================");
-           // InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
-            //ClientRMI client = new ClientRMI(this.getName());
-            //h.saveClients(this.getName(), (InterfaceClientRMI) client);
+            InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+            ClientRMI client = new ClientRMI(this.getName());
+            h.saveClients(this.getName(), (InterfaceClientRMI) client);
             
             socket = new MulticastSocket(PORT);  
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -77,9 +77,9 @@ public class MulticastServer extends Thread {
 
             while (true) {                
                 dataReceived = receiveData(socket);
-                analyseData(socket, dataReceived/*, h*/);
+                analyseData(socket, dataReceived, h);
             } 
-        } catch (IOException e) { e.printStackTrace();} //catch (NotBoundException e) {e.printStackTrace();}
+        } catch (IOException e) { e.printStackTrace();} catch (NotBoundException e) {e.printStackTrace();}
     }
 
     public static void main(String[] args) throws IOException {

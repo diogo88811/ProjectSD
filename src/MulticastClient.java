@@ -37,6 +37,7 @@ public class MulticastClient extends Thread {
     public void analyzeData(MulticastSocket socket, String data) throws IOException, InterruptedException{
         
         String aux[] = data.split("[;]");
+
         for(String a : aux){
             String types[] = a.split("\\|");
             info.put(types[0].trim(), types[1].trim());
@@ -45,24 +46,22 @@ public class MulticastClient extends Thread {
         if(info.get("type").equals("request") && state == true){
             user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE", false);
         }
-        if(info.get("type").equals("reserve")){
+        
+        else if(info.get("type").equals("reserve")){
             if(user.getName().equals(info.get("terminalID"))){
                 user.sendData(socket, "type | reserved ; IDclient | " + user.getName(), false);
                 state = false;
                 System.out.print("CCNUMBER: ");
-                while((name = reader.readLine()) == null){
-                    System.out.print("PASSWORD: ");
-                    String password = reader.readLine();
-                    user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
+                name = reader.readLine());
+                System.out.print("PASSWORD: ");
+                String password = reader.readLine();
+                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
             }
         }  
-        if(info.get("type").equals("vote")){
-            if(info.get("userData").equals("valid")){
-                //vai buscar lista ao RMI
-                //vota
-                String vote = "";
-                user.sendData(socket, "type | voteComplete ; username | " + info.get("username") + " ; vote | " + vote , false);
-            }
+        else if(  info.get("type").equals("vote") && info.get("userData").equals("valid")){
+            String vote = "";
+            user.sendData(socket, "type | voteComplete ; username | " + info.get("username") + " ; vote | " + vote , false);
+            state = true;
         }
     }
 
