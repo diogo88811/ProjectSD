@@ -36,11 +36,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-		System.out.println("======================ADMIN CONSOLE!======================");
-		System.out.println("1. Registar pessoas");
-		System.out.println("2. Criar Eleicao");
-		System.out.println("3. Gerir Candidatos a uma Eleicao ");
-		System.out.println("4. Gerir Mesas de Votos");
+
 
 		try {
 
@@ -49,18 +45,33 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 			h.saveClients(args[0], (InterfaceClientRMI) client);
 
 			while (true) {
+				System.out.println("======================ADMIN CONSOLE!======================");
+				System.out.println("1. Registar pessoas");
+				System.out.println("2. Criar Eleicao");
+				System.out.println("3. Gerir Candidatos a uma Eleicao ");
+				System.out.println("4. Gerir Mesas de Votos");
 				menuOption = scan.nextInt();
 				switch(menuOption){
 					case 1:
 						Pessoa pessoa = new Pessoa();
 						pessoa.RegisterPerson();
-						//System.out.println(pessoa.toString());
-						h.SaveRegistry(pessoa);
+						try{
+							h.SaveRegistry(pessoa);
+						}catch(Exception e){
+							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							h.SaveRegistry(pessoa);
+						}
 						break;
 					case 2:
 						Eleicao eleicao  = new Eleicao();
-						eleicao.createEleicao(h.getEstudantes());
-						h.criarEleicao(eleicao);
+						try{
+							eleicao.createEleicao(h.getEstudantes());
+							h.criarEleicao(eleicao);
+						}catch (Exception e){
+							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							eleicao.createEleicao(h.getEstudantes());
+							h.criarEleicao(eleicao);
+						}
 						break;
 					case 3:
 						ArrayList<Eleicao> election;
