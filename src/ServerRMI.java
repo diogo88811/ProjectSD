@@ -8,20 +8,18 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.TimeoutException;
 
 public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	ArrayList<Pessoa> Estudantes = new ArrayList<Pessoa>();
-	ArrayList<Pessoa> Docentes = new ArrayList<Pessoa>();
-	ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>();
-	ArrayList<Pessoa> person = new ArrayList<Pessoa>();
-	ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
-	ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
+	static ArrayList<Pessoa> Estudantes = new ArrayList<Pessoa>();
+	static ArrayList<Pessoa> Docentes = new ArrayList<Pessoa>();
+	static ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>();
+	static ArrayList<Pessoa> person = new ArrayList<Pessoa>();
+	static ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
+	static ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
 
 	public ServerRMI() throws RemoteException {
 		super();
@@ -51,53 +49,82 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		return this.clients;
 	}
 
-	private static void loadData(ServerRMI h) {
-
+	public static void loadDataElection() throws RemoteException {
+		System.out.println("Getting data....");
 		try {
-			FileInputStream fis = new FileInputStream("eleicao.dat");
-			ObjectInputStream ois = new ObjectInputStream(fis);
+			FileInputStream fin = new FileInputStream("eleicao.txt");
+			ObjectInput oin = new ObjectInputStream(fin);
 
-			// read object from file7
-			Eleicao ele ;
-			while((ele = (Eleicao) ois.readObject()) != null){
-				h.eleicoes.add(ele);
+			System.out.println("DeSerialization process has started, "
+					+ "displaying employee objects...");
+
+			eleicoes = (ArrayList<Eleicao>) oin.readObject();
+			if(eleicoes.isEmpty()){
+				System.out.println("vazio");
+			}
+			else{
+				for(Eleicao e : eleicoes){
+					System.out.println(e.getNome());
+				}
 			}
 
+			oin.close();
+			fin.close();
 
-		} catch (IOException | ClassNotFoundException ex) {
-			ex.printStackTrace();
+		} catch (EOFException e) {
+			System.out.println("File ended");
+		}  catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
 		try {
-			FileInputStream fis = new FileInputStream("Pessoas.dat");
-			 ObjectInputStream ois = new ObjectInputStream(fis) ;
+			FileInputStream fin = new FileInputStream("Pessoas.txt");
+			ObjectInput oin = new ObjectInputStream(fin);
 
-			// read object from file7
-			Pessoa ele ;
-			while((ele = (Pessoa) ois.readObject()) != null){
-				h.person.add(ele);
+			person = (ArrayList<Pessoa>) oin.readObject();
+			if(person.isEmpty()){
+				System.out.println("sem pesoas");
+			}
+			else{
+				for(Pessoa e : person){
+					System.out.println(e.getNome());
+				}
 			}
 
-		} catch (IOException | ClassNotFoundException ex) {
-			ex.printStackTrace();
+			oin.close();
+			fin.close();
+
+		} catch (EOFException e) {
+			System.out.println("File ended");
+		}  catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
-		for(Pessoa p : h.person){
+		for(Pessoa p : person){
 			if (p.getTrabalho().toUpperCase().equals("ESTUDANTE")) {
-				h.Estudantes.add(p);
+				Estudantes.add(p);
 
 			} else if (p.getTrabalho().toUpperCase().equals("DOCENTE")) {
-				h.Docentes.add(p);
+				Docentes.add(p);
 
 			} else if (p.getTrabalho().toUpperCase().equals("FUNCIONARIO")) {
-				h.Funcionarios.add(p);
+				Funcionarios.add(p);
 			}
 		}
 	}
 
+
 	public void SaveRegistry(Pessoa pessoa) throws RemoteException {
 
-		File arquivo = new File("Pessoas.dat");
+		File arquivo = new File("Pessoas.txt");
 		try {
 			if (!arquivo.exists()) {
 				arquivo.createNewFile();
@@ -106,7 +133,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			ObjectOutputStream bw = new ObjectOutputStream(fw);
 
 			// type | register ; username | pierre ; password | omidyar ; job | estudante ; tele | 913613099 ; adress | Seia ; CCNumber | 123 ; CCVal | 12/05/2023 ; Depart | UC ;
-
+			person.add(pessoa);
 			if (pessoa.getTrabalho().toUpperCase().equals("ESTUDANTE")) {
 				Estudantes.add(pessoa);
 
@@ -117,7 +144,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 				Funcionarios.add(pessoa);
 			}
 
-			bw.writeObject(pessoa);
+			bw.writeObject(person);
 			bw.close();
 			fw.close();
 			System.out.println("SUCCESSFULLY REGISTERED !");
@@ -132,20 +159,16 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 	public void criarEleicao(Eleicao eleicao) throws RemoteException {
 
-		File arquivo = new File("eleicao.dat");
 		try {
-			if (!arquivo.exists()) {
-				arquivo.createNewFile();
-			}
 
-			FileOutputStream fw = new FileOutputStream(arquivo, true);
-			ObjectOutputStream bw = new ObjectOutputStream(fw);
+
+			OutputStream fout = new FileOutputStream("eleicao.txt");
+			ObjectOutput oout = new ObjectOutputStream(fout);
 
 			// type | eleicao ; nome | Lista A ; dataInicio | 12/04/2021 13:30 ; dataFim | 12/04/2021 18:30 ; publicoAlvo | estudantes ;
 			eleicoes.add(eleicao);
-			bw.writeObject(eleicao);
-			bw.close();
-			fw.close();
+			oout.writeObject(eleicoes);
+			oout.close();
 			System.out.println("MESA DE VOTO CRIADA COM SUCESSO !");
 
 		} catch (IOException ex) {
@@ -162,8 +185,13 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
-	public void verifyUser(String nome, String ccNumber, String password){
-		//verifica se o user está bem
+	public boolean verifyUser(String nome, String ccNumber, String password) throws RemoteException{
+		for(int i = 0; i< person.size(); i++){
+			if(person.get(i).nome.equals(nome) && person.get(i).CCnumber.equals(ccNumber) && person.get(i).password.equals(password)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static void main(String args[]) throws IOException, InterruptedException {
@@ -213,9 +241,9 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
 
-			loadData(h);
+			loadDataElection();
 
-			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+			//System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			System.out.println("======================RMI SERVER READY!======================");
 
 			while (true) {
