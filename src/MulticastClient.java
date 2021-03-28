@@ -52,16 +52,20 @@ public class MulticastClient extends Thread {
                 user.sendData(socket, "type | reserved ; IDclient | " + user.getName(), false);
                 state = false;
                 System.out.print("CCNUMBER: ");
-                name = reader.readLine());
+                name = reader.readLine();
                 System.out.print("PASSWORD: ");
                 String password = reader.readLine();
                 user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
             }
         }  
         else if(  info.get("type").equals("vote") && info.get("userData").equals("valid")){
-            String vote = "";
-            user.sendData(socket, "type | voteComplete ; username | " + info.get("username") + " ; vote | " + vote , false);
-            state = true;
+            user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") , false);
+        }
+        else if( info.get("type").equals("item_list")){
+            System.out.println("LISTA DE CANDIDATOS");
+            for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
+                System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
+            }
         }
     }
 

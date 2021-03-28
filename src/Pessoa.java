@@ -103,54 +103,53 @@ public class Pessoa implements Serializable {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         Scanner scan = new Scanner(System.in);
-        Pessoa pessoa = new Pessoa();
         String in;
         int num;
 
-        System.out.print("Insira o nome:");
+        System.out.print("NOME: ");
         in = reader.readLine();
         this.nome = in;
 
-        System.out.print("Insira o contacto telefónico:");
+        System.out.print("TELEMOVEL: ");
         in = reader.readLine();
         this.telemovel = in;
 
-        System.out.println("Insira a morada:");
+        System.out.print("MORADA: ");
         in = reader.readLine();
 
         this.morada = in;
 
-        System.out.println("Insira número do CC:");
+        System.out.print("NUMERO CC: ");
         in = reader.readLine();
 
         this.CCnumber = in;
 
-        System.out.println("Insira validade dd/mm/aaaa do CC:");
+        System.out.print("VALIDADE CC (dd/mm/aaaa): ");
         in = reader.readLine();
 
         this.CCVal = in;
 
-        System.out.println("Cargo:");
-        System.out.println("1 - Estudante");
-        System.out.println("2 - Docente");
-        System.out.println("3 - Funcionario");
+        System.out.println("CARGO:");
+        System.out.println("<1> ESTUDANTE");
+        System.out.println("<2> DOCENTE");
+        System.out.println("<3> FUNCIONARIO");
         num = scan.nextInt();
         switch(num){
             case 1:
-                this.trabalho = "Estudante";
+                this.trabalho = "ESTUDANTE";
                 break;
             case 2:
-                this.trabalho = "Docente";
+                this.trabalho = "DOCENTE";
             case 3:
-                this.trabalho = "Funcionario";
+                this.trabalho = "FUNCIONARIO";
         }
 
-        System.out.println("Insira o departamento que frequenta:");
+        System.out.print("DEPARTAMENTO QUE FREQUENTA: ");
         in = reader.readLine();
 
         this.departamento = in;
 
-        System.out.println("Insira uma password:");
+        System.out.print("PASSWORD: ");
         in = reader.readLine();
 
         this.password = in;

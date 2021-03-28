@@ -165,7 +165,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			OutputStream fout = new FileOutputStream("eleicao.txt");
 			ObjectOutput oout = new ObjectOutputStream(fout);
 
-			// type | eleicao ; nome | Lista A ; dataInicio | 12/04/2021 13:30 ; dataFim | 12/04/2021 18:30 ; publicoAlvo | estudantes ;
 			eleicoes.add(eleicao);
 			oout.writeObject(eleicoes);
 			oout.close();

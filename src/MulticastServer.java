@@ -56,9 +56,17 @@ public class MulticastServer extends Thread {
             System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
         }
         else if(info.get("type").equals("authentication")){
-            if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
+           // if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
                 user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
+           // }
+        }
+        else if(info.get("type").equals("item_listRequire")){
+            String lista = "type | item_list ; item_count | " + h.getEstudantes().size() + " ; ";
+            for(int i = 0; i< h.getEstudantes().size(); i++){
+                System.out.println(h.getEstudantes().get(i).nome);
+                lista += "item_" + i + "_name | " + h.getEstudantes().get(i).nome + " ; ";
             }
+            user.sendData(socket, lista + "username | " + info.get("username"));
         }
     }
 
@@ -75,7 +83,7 @@ public class MulticastServer extends Thread {
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
 
-            while (true) {                
+            while (true) {            
                 dataReceived = receiveData(socket);
                 analyseData(socket, dataReceived, h);
             } 
@@ -133,7 +141,6 @@ class MulticastUser extends Thread {
                     verify = true;
                     System.out.println("=======================================< " + dep + " >=========================================");
                     System.out.println("<1> LOGIN");
-                    System.out.println("\n\n\n\n\n\n\n");
                 }
                 else{
                     String teste = reader.readLine();

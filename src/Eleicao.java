@@ -23,57 +23,42 @@ public class Eleicao implements Serializable {
         this.estado = estado;
         this.listas = listas;
     }
-
-
     public  Eleicao(){
 
     }
-
     public String getNome() {
         return this.nome;
     }
-
     public void setNome(String nome) {
         this.nome = nome;
     }
-
     public String getDataInicio() {
         return this.DataInicio;
     }
-
     public void setDataInicio(String DataInicio) {
         this.DataInicio = DataInicio;
     }
-
     public boolean getEstado(){
         return this.estado;
     }
-
     public String getDataFim() {
         return this.DataFim;
     }
-
     public void setDataFim(String DataFim) {
         this.DataFim = DataFim;
     }
-
     public String getPublicoAlvo() {
         return this.publicoAlvo;
     }
-
     public void setPublicoAlvo(String publicoAlvo) {
         this.publicoAlvo = publicoAlvo;
     }
-
-
     public ArrayList<Lista> getListas() {
         return listas;
     }
-
     public void setListas(ArrayList<Lista> listas) {
         this.listas = listas;
     }
-
     @Override
     public String toString() {
         return "Eleicao{" +
@@ -89,19 +74,21 @@ public class Eleicao implements Serializable {
     public void createEleicao(ArrayList<Pessoa> pessoa) throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-        Scanner scan = new Scanner(System.in);
         String in;
-        System.out.println("Insira nome da eleição");
+
+        System.out.print("NOME ELEICAO: ");
         in = reader.readLine();
         this.nome = in;
-        System.out.println("Insira data de inicio dd/mm/aaaa");
+
+        System.out.print("DATA INICIO (dd/mm/aaaa): ");
         in = reader.readLine();
         this.DataInicio = in;
-        System.out.println("Insira data de fim dd/mm/aaaa");
+
+        System.out.print("DATA FIM (dd/mm/aaaa): ");
         in = reader.readLine();
         this.DataFim = in;
-
-        System.out.println("Insira publico alvo");
+        
+        System.out.print("PUBLICO ALVO: ");
         in = reader.readLine();
         this.publicoAlvo = in;
 

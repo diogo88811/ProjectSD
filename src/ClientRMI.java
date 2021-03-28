@@ -46,10 +46,11 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 			while (true) {
 				System.out.println("======================ADMIN CONSOLE!======================");
-				System.out.println("1. Registar pessoas");
-				System.out.println("2. Criar Eleicao");
-				System.out.println("3. Gerir Candidatos a uma Eleicao ");
-				System.out.println("4. Gerir Mesas de Votos");
+				System.out.println("<1> REGISTAR PESSOA");
+				System.out.println("<2> CRIAR ELEICAO");
+				System.out.println("<3> GERIR CANDIDATOS A UMA ELEICAO ");
+				System.out.println("<4> GERIR MESAS DE VOTOS");
+				System.out.print(">");
 				menuOption = scan.nextInt();
 				switch(menuOption){
 					case 1:
@@ -82,14 +83,15 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
 							election = h.getEleicoes();
 						}
-						System.out.println("Selecione a eleicao: ");
+
+						System.out.println("SELECIONE UMA ELEICAO\n> ");
 						for(int i = 0; i < election.size(); i++){
-							System.out.println(i+": "+""+election.get(i).getNome());
+							System.out.println("<" + i +"> " + election.get(i).getNome());
 						}
 						int listnum = scan.nextInt();
 						ArrayList<Lista> li = election.get(listnum).getListas();
 						if(li == null){
-							System.out.println("Não há listas, tem de adicionar:");
+							System.out.println("NAO EXISTEM LISTAS DISPONIVEIS, POR FAVOR ADICIONE UMA LISTA !");
 
 						}
 						else{
@@ -98,29 +100,6 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						break;
 
 				}
-
-				/*
-				System.out.print("> ");
-				a = reader.readLine();
-				h.print_on_server(a);
-				*/
-				/*
-				scanf (nome);
-				h.SaveRegistry(nome, idade);
-				*/
-				/*
-				 * String line = scanner.nextLine(); String[] arrOfStr = line.split(" | ");
-				 * 
-				 * // type | eleicao ; nome | Lista A ; dataInicio | 12/04/2021 13:30 ; dataFim
-				 * | 12/04/2021 18:30 ; publico | estudantes ;
-				 * if(arrOfStr[2].equals("eleicao")){ h.criarEleicao(line); } // type | register
-				 * ; username | pierre ; password | omidyar ; job | estudante ; tele | 913613099
-				 * ; adress | Seia ; CCNumber | 123 ; CCVal | 12/05/2023 ; Depart | UC ; else
-				 * if(arrOfStr[2].equals("register")){ h.SaveRegistry(line); } else
-				 * if(line.equals("mesa")){
-				 * 
-				 * }
-				 */
 			}
 
 		} catch (Exception e) {
