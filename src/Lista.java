@@ -9,6 +9,7 @@ public class Lista implements Serializable  {
     ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
     Pessoa candidatoPrincipal;
     String nomeLista;
+    int numVotes;
 
     public Lista() {
     }
@@ -44,6 +45,14 @@ public class Lista implements Serializable  {
         return nomeLista;
     }
 
+    public int getNumVotes() {
+        return numVotes;
+    }
+
+    public void setNumVotes(int numVotes) {
+        this.numVotes = numVotes;
+    }
+
     @Override
     public String toString() {
         return "Lista{" +
@@ -61,6 +70,8 @@ public class Lista implements Serializable  {
         else{
             System.out.println("CANDIDATO PRINCIPAL: ");
             System.out.println(this.getCandidatoPrincipal().nome);
+            System.out.println("NUMERO DE VOTOS: ");
+            System.out.println(this.getNumVotes());
             System.out.println("OUTRAS PESSOAS DA LISTA: ");
             for(Pessoa p : this.getPessoas()){
                 System.out.println(p.getNome());

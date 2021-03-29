@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 
 public class MulticastClient extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.1";
-    
+
     private static MulticastUserClient user;
     private static MulticastClient client;
     boolean state = true;
@@ -20,22 +20,22 @@ public class MulticastClient extends Thread {
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    
+
     public MulticastClient() {
         super("CLIENT " + (long) (Math.random() * 1000));
     }
-    
+
     public String receiveData(MulticastSocket socket) throws IOException{
         byte[] buffer = new byte[256];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
         String message = new String(packet.getData(), 0, packet.getLength());
-        
+
         return message;
     }
-   
+
     public void analyzeData(MulticastSocket socket, String data) throws IOException, InterruptedException{
-        
+
         String aux[] = data.split("[;]");
 
         for(String a : aux){
@@ -46,7 +46,7 @@ public class MulticastClient extends Thread {
         if(info.get("type").equals("request") && state == true){
             user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
         }
-        
+
         else if(info.get("type").equals("reserve")){
             if(user.getName().equals(info.get("terminalID"))){
                 user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; IDclient | " + user.getName() + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
@@ -57,7 +57,7 @@ public class MulticastClient extends Thread {
                 String password = reader.readLine();
                 user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
             }
-        }  
+        }
 
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
             if(user.getName().equals(info.get("terminalID"))){
@@ -65,20 +65,20 @@ public class MulticastClient extends Thread {
                 user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
             }
         }
-        
+
         else if(info.get("type").equals("item_list")){
             if(user.getName().equals(info.get("terminalID"))){
                 System.out.println("LISTA DE CANDIDATOS");
                 for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
                     System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
                 }
-            
+
                 int voto = keyboardScanner.nextInt();
                 user.sendData(socket, "type | done ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; voto | " + info.get("item_" + voto + "_name"), false);
                 state = true;
             }
         }
-        
+
     }
 
     public void run() {
@@ -91,7 +91,7 @@ public class MulticastClient extends Thread {
             while (true) {
                 data = receiveData(socket);
                 analyzeData(socket, data);
-            } 
+            }
         }catch (IOException e) { e.printStackTrace();} catch (InterruptedException e) { e.printStackTrace();}
     }
 
@@ -114,7 +114,7 @@ class MulticastUserClient extends Thread {
 
     public String sendData(MulticastSocket socket, String msg, boolean premission) throws IOException{
         Scanner keyboardScanner = new Scanner(System.in);
-        
+
         if(premission == true){
             String a = keyboardScanner.nextLine();
             String aux = msg + a;
@@ -140,7 +140,7 @@ class MulticastUserClient extends Thread {
         MulticastSocket socket = null;
         System.out.println("================================< " + this.getName() + " >=========================================");
         try {
-            socket = new MulticastSocket(); 
+            socket = new MulticastSocket();
             Scanner keyboardScanner = new Scanner(System.in);
             while (true) {
                 //fefe

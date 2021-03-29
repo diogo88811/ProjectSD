@@ -122,6 +122,7 @@ public class Eleicao implements Serializable {
                     break;
                 }
             }
+            l.setNumVotes(0);
             this.listas.add(l);
         }
 
