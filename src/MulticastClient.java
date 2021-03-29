@@ -44,27 +44,34 @@ public class MulticastClient extends Thread {
         }
 
         if(info.get("type").equals("request") && state == true){
-            user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE", false);
+            user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
         }
         
         else if(info.get("type").equals("reserve")){
             if(user.getName().equals(info.get("terminalID"))){
-                user.sendData(socket, "type | reserved ; IDclient | " + user.getName(), false);
+                user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
                 state = false;
                 System.out.print("NOME : " + info.get("username"));
                 System.out.print("\nNUMERO CC : " + info.get("ccNumber"));
                 System.out.print("\nPASSWORD: ");
                 String password = reader.readLine();
-                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password, false);
+                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
             }
         }  
+        
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
-            user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") , false);
+            if(user.getName().equals(info.get("terminalID"))){
+                System.out.println("\nBEM VINDO, " + info.get("username") + " !\n");
+                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+            }
         }
+        
         else if(info.get("type").equals("item_list")){
-            System.out.println("LISTA DE CANDIDATOS");
-            for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
-                System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
+            if(user.getName().equals(info.get("terminalID"))){
+                System.out.println("LISTA DE CANDIDATOS");
+                for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
+                    System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
+                }
             }
         }
     }

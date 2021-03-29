@@ -1,11 +1,9 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Eleicao implements Serializable {
 
@@ -100,8 +98,8 @@ public class Eleicao implements Serializable {
         System.out.println("NUMERO DE LISTAS: ");
         numberOfLists = scan.nextInt();
 
-        Lista l = new Lista();
         for(int i = 0; i < numberOfLists; i++){
+            Lista l = new Lista();
             System.out.println("LISTA "+(i+1)+":");
             System.out.print("NOME DA LISTA: ");
             in = reader.readLine();
@@ -124,9 +122,9 @@ public class Eleicao implements Serializable {
                     break;
                 }
             }
+            this.listas.add(l);
         }
 
-        this.listas.add(l);
         this.estado = true;
 
     }

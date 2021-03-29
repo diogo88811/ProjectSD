@@ -22,8 +22,9 @@ public class MulticastServer extends Thread {
     String dataReceived;
     int number = 0;
     int id = 0;
-    HashMap<String, String> info = new HashMap<String, String>();
+   
     InterfaceServerRMI h;
+    
 
     public MulticastServer(InterfaceServerRMI h) {
         super("SERVER " + (long) (Math.random() * 1000));
@@ -35,11 +36,10 @@ public class MulticastServer extends Thread {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
         String message = new String(packet.getData(), 0, packet.getLength());
-//        System.out.println(message);
         return message;
     }
     
-    public void analyseData(MulticastSocket socket, String data) throws IOException{
+    public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException{
 
         String aux[] = data.split("[;]");
         for(String a : aux){
@@ -48,31 +48,43 @@ public class MulticastServer extends Thread {
         }
 
         if(info.get("type").equals("login")){ //"type | login ; username | Miguel ; ccNumber | 1234
-            user.sendData(socket, "type | request ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number );
+            user.sendData(socket, "type | request ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
         }
         else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
-            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
+            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
             number++;
         }
         else if(info.get("type").equals("reserved")){
             System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
+            System.out.println("________________________________________________________________________");
+
         }
         else if(info.get("type").equals("authentication")){
             if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD")) == true){
-                System.out.println("BEM VINDO, " + info.get("username") + " !");
-                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
+                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
             }
             else{
                 System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE SE NA NOSSA PLATAFORMA !");
             }
         }
         else if(info.get("type").equals("item_listRequire")){
-            String lista = "type | item_list ; item_count | " + h.getEstudantes().size() + " ; ";
-            for(int i = 0; i< h.getEstudantes().size(); i++){
-                System.out.println(h.getEstudantes().get(i).nome);
-                lista += "item_" + i + "_name | " + h.getEstudantes().get(i).nome + " ; ";
+
+            ArrayList <Lista> listaEleicao = null ;
+
+            String lista = "type | item_list ; item_count | " + info.get("tamanhoLista") + " ; ";
+
+            ArrayList<Eleicao> eleicoes = h.getEleicoes();
+
+            for (int i = 0; i< eleicoes.size(); i++){
+                if(eleicoes.get(i).getNome().equals(info.get("eleicao"))){
+                    Eleicao eleicao = eleicoes.get(i);
+                    listaEleicao = eleicao.getListas();
+                }
             }
-            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber"));
+            for(int i = 0; i< Integer.parseInt(info.get("tamanhoLista")); i++){
+                lista += "item_" + i + "_name | " + listaEleicao.get(i).getNomeLista() + " ; ";
+            }
+            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho"));
         }
     }
 
@@ -88,10 +100,11 @@ public class MulticastServer extends Thread {
             socket = new MulticastSocket(PORT);  
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
+            HashMap<String, String> info = new HashMap<String, String>();
 
             while (true) {            
                 dataReceived = receiveData(socket);
-                analyseData(socket, dataReceived);
+                analyseData(socket, dataReceived, info);
             } 
         } catch (IOException e) { e.printStackTrace();}
     }
@@ -131,7 +144,6 @@ class MulticastUser extends Thread {
     
     public void sendToServer(MulticastSocket socket, String data) throws IOException{
         String aux = data + " " ;
-        //System.out.println(aux);
         byte[] buffer = aux.getBytes();
         InetAddress group = InetAddress.getByName("224.0.224.0");
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -142,16 +154,9 @@ class MulticastUser extends Thread {
         MulticastSocket socket = null;
         try {
             socket = new MulticastSocket();  
+            System.out.println("<1> - LOGIN NA MESA DE VOTO");
             while (true) {
-                if(verify == false){
-                    System.out.println("IDENTIFICA O DEPARTEMENTO DA MESA :");
-                    System.out.print(">");
-                    String dep = reader.readLine();
-                    verify = true;
-                    System.out.println("=======================================< " + dep + " >=========================================");
-                    System.out.println("<1> LOGIN");
-                }
-                else{
+                System.out.print(">");
                     String teste = reader.readLine();
                     if(teste.equals("1")){
                         System.out.print("NAME: ");
@@ -159,9 +164,17 @@ class MulticastUser extends Thread {
                         System.out.print("CC NUMBER: ");
                         String cc = reader.readLine();
                         h.verifyLogin(aux, cc);
-                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc );  
+                        System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
+                        
+                        for(int i = 0; i< h.getEleicoes().size(); i++){
+                            System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                        }
+                        int numEleicoes = keyboardScanner.nextInt();
+                        String eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                        int tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                        
+                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho);  
                     }
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
