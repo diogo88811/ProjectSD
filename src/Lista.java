@@ -52,4 +52,20 @@ public class Lista implements Serializable  {
                 ", nomeLista='" + nomeLista + '\'' +
                 '}';
     }
+
+
+    public void manageCandidateList(){
+        if(this == null){
+            System.out.println("NAO EXISTEM LISTAS DISPONIVEIS !");
+        }
+        else{
+            System.out.println("CANDIDATO PRINCIPAL: ");
+            System.out.println(this.getCandidatoPrincipal().nome);
+            System.out.println("OUTRAS PESSOAS DA LISTA: ");
+            for(Pessoa p : this.getPessoas()){
+                System.out.println(p.getNome());
+            }
+        }
+    }
+
 }

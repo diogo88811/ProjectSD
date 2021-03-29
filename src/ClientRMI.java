@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -90,13 +91,14 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						}
 						int listnum = scan.nextInt();
 						ArrayList<Lista> li = election.get(listnum).getListas();
-						if(li == null){
-							System.out.println("NAO EXISTEM LISTAS DISPONIVEIS, POR FAVOR ADICIONE UMA LISTA !");
 
+						System.out.println("LISTAS PRESENTES NA ELEIÇÂO");
+						for(int i = 0; i < li.size(); i++){
+							System.out.println("<" + i +"> " + li.get(i).getNomeLista());
 						}
-						else{
-							System.out.println(li.get(0).getCandidatoPrincipal().nome);
-						}
+						listnum = scan.nextInt();
+						li.get(listnum).manageCandidateList();
+
 						break;
 
 				}
