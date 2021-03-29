@@ -1,5 +1,6 @@
 import java.net.MulticastSocket;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.net.DatagramPacket;
@@ -44,25 +45,37 @@ public class MulticastClient extends Thread {
         }
 
         if(info.get("type").equals("request") && state == true){
-            user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+            user.sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + user.getName() + " ; msg | FREE ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
         }
 
         else if(info.get("type").equals("reserve")){
             if(user.getName().equals(info.get("terminalID"))){
-                user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; IDclient | " + user.getName() + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; IDclient | " + user.getName() + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
                 state = false;
                 System.out.print("NOME : " + info.get("username"));
                 System.out.print("\nNUMERO CC : " + info.get("ccNumber"));
                 System.out.print("\nPASSWORD: ");
-                String password = reader.readLine();
-                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                String password = null;
+
+                long sTime = System.currentTimeMillis();
+                while (System.currentTimeMillis() - sTime < 5000){
+                    if (System.in.available() > 0){
+                        password = keyboardScanner.nextLine();
+                        user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+                        break;
+                    }
+                }
+                if(password == null){
+                    System.out.println("\nERRO NA AUTENTICACAO DO UTILIZADOR");
+                    state = true;
+                }
             }
         }
 
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
             if(user.getName().equals(info.get("terminalID"))){
                 System.out.println("\nBEM VINDO, " + info.get("username") + " !\n");
-                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
             }
         }
 
@@ -74,7 +87,13 @@ public class MulticastClient extends Thread {
                 }
 
                 int voto = keyboardScanner.nextInt();
-                user.sendData(socket, "type | done ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; voto | " + info.get("item_" + voto + "_name"), false);
+                user.sendData(socket, "type | done ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; voto | " + info.get("item_" + voto + "_name") + " ; serverName | " + info.get("serverName"), false);
+                state = true;
+                System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+            }
+        }
+        else if(info.get("type").equals("restart")){
+            if(user.getName().equals(info.get("terminalID"))){
                 state = true;
             }
         }

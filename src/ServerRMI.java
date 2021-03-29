@@ -121,7 +121,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		}
 	}
 
-
 	public void SaveRegistry(Pessoa pessoa) throws RemoteException {
 
 		File arquivo = new File("Pessoas.txt");
