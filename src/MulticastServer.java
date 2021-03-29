@@ -84,7 +84,10 @@ public class MulticastServer extends Thread {
             for(int i = 0; i< Integer.parseInt(info.get("tamanhoLista")); i++){
                 lista += "item_" + i + "_name | " + listaEleicao.get(i).getNomeLista() + " ; ";
             }
-            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho"));
+            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho"));
+        }
+        else if(info.get("type").equals("done")){
+            h.print_on_server("USER " + info.get("username") + " VOTOU EM " +  info.get("voto"));
         }
     }
 
