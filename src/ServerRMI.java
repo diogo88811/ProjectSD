@@ -184,6 +184,34 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
+	public void saveVotes(String eleicao, String lista) throws RemoteException{
+		//eleicao
+		//lista em que votou
+		boolean flag = false;
+		System.out.println("tamanho das eleicoes " + eleicoes.size());
+		for(int i = 0; i < eleicoes.size() ; i++){
+			if(eleicoes.get(i).getNome().equals(eleicao)){
+				ArrayList<Lista> l = eleicoes.get(i).listas;
+				System.out.println("Tamanho das lista "+l.size());
+				for(int j = 0; j < l.size(); j++){
+					if(l.get(j).getNomeLista().equals(lista)){
+						l.get(j).setNumVotes((l.get(j).getNumVotes() + 1));
+						//loadDataElection(); // sempre que alguem vota adiciona o voto
+						flag = true;
+					}
+				}
+			}
+		}
+
+		if(!flag){
+			System.out.println("Em branco ou nulo");
+		}
+
+		System.out.println(eleicao);
+		System.out.println(lista);
+
+	}
+
 	public boolean verifyUser(String nome, String ccNumber, String password) throws RemoteException{
 		for(int i = 0; i< person.size(); i++){
 			if(person.get(i).nome.equals(nome) && person.get(i).CCnumber.equals(ccNumber) && person.get(i).password.equals(password)){

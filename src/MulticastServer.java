@@ -22,9 +22,9 @@ public class MulticastServer extends Thread {
     String dataReceived;
     int number = 0;
     int id = 0;
-   
+
     InterfaceServerRMI h;
-    
+
 
     public MulticastServer(InterfaceServerRMI h) {
         super("SERVER " + (long) (Math.random() * 1000));
@@ -38,7 +38,7 @@ public class MulticastServer extends Thread {
         String message = new String(packet.getData(), 0, packet.getLength());
         return message;
     }
-    
+
     public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException{
 
         String aux[] = data.split("[;]");
@@ -87,7 +87,7 @@ public class MulticastServer extends Thread {
             user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho"));
         }
         else if(info.get("type").equals("done")){
-            h.print_on_server("USER " + info.get("username") + " VOTOU EM " +  info.get("voto"));
+            h.saveVotes(info.get("eleicao"),info.get("voto"));
         }
     }
 
@@ -96,19 +96,19 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null;
         try {
             System.out.println("================================< " + this.getName() + " >=========================================");
-            
+
             ClientRMI client = new ClientRMI(this.getName());
             h.saveClients(this.getName(), (InterfaceClientRMI) client);
-            
-            socket = new MulticastSocket(PORT);  
+
+            socket = new MulticastSocket(PORT);
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
             HashMap<String, String> info = new HashMap<String, String>();
 
-            while (true) {            
+            while (true) {
                 dataReceived = receiveData(socket);
                 analyseData(socket, dataReceived, info);
-            } 
+            }
         } catch (IOException e) { e.printStackTrace();}
     }
 
@@ -144,7 +144,7 @@ class MulticastUser extends Thread {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
     }
-    
+
     public void sendToServer(MulticastSocket socket, String data) throws IOException{
         String aux = data + " " ;
         byte[] buffer = aux.getBytes();
@@ -152,37 +152,37 @@ class MulticastUser extends Thread {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
         socket.send(packet);
     }
-  
+
     public void run() {
         MulticastSocket socket = null;
         try {
-            socket = new MulticastSocket();  
+            socket = new MulticastSocket();
             System.out.println("<1> - LOGIN NA MESA DE VOTO");
             while (true) {
                 System.out.print(">");
-                    String teste = reader.readLine();
-                    if(teste.equals("1")){
-                        System.out.print("NAME: ");
-                        String aux = reader.readLine();
-                        System.out.print("CC NUMBER: ");
-                        String cc = reader.readLine();
-                        h.verifyLogin(aux, cc);
-                        System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
-                        
-                        for(int i = 0; i< h.getEleicoes().size(); i++){
-                            System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
-                        }
-                        int numEleicoes = keyboardScanner.nextInt();
-                        String eleicao =  h.getEleicoes().get(numEleicoes).getNome();
-                        int tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
-                        
-                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho);  
+                String teste = reader.readLine();
+                if(teste.equals("1")){
+                    System.out.print("NAME: ");
+                    String aux = reader.readLine();
+                    System.out.print("CC NUMBER: ");
+                    String cc = reader.readLine();
+                    h.verifyLogin(aux, cc);
+                    System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
+
+                    for(int i = 0; i< h.getEleicoes().size(); i++){
+                        System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
                     }
+                    int numEleicoes = keyboardScanner.nextInt();
+                    String eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                    int tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+
+                    sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }  finally {
             socket.close();
         }
-    }   
+    }
 }
