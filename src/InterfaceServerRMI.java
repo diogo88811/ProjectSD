@@ -13,4 +13,6 @@ public interface InterfaceServerRMI extends Remote{
 	public ArrayList<Eleicao> getEleicoes() throws RemoteException;
 	public ArrayList<InterfaceClientRMI> getClients() throws RemoteException;
 	public boolean verifyUser(String nome, String ccNumber, String password)throws RemoteException;
+	public boolean verifyLogin(String nome, String ccNumber) throws RemoteException ;
+
 }

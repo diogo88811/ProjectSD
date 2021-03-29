@@ -23,9 +23,11 @@ public class MulticastServer extends Thread {
     int number = 0;
     int id = 0;
     HashMap<String, String> info = new HashMap<String, String>();
+    InterfaceServerRMI h;
 
-    public MulticastServer() {
+    public MulticastServer(InterfaceServerRMI h) {
         super("SERVER " + (long) (Math.random() * 1000));
+        this.h = h;
     }
 
     public String receiveData(MulticastSocket socket) throws IOException{
@@ -37,7 +39,7 @@ public class MulticastServer extends Thread {
         return message;
     }
     
-    public void analyseData(MulticastSocket socket, String data, InterfaceServerRMI h) throws IOException{
+    public void analyseData(MulticastSocket socket, String data) throws IOException{
 
         String aux[] = data.split("[;]");
         for(String a : aux){
@@ -45,20 +47,24 @@ public class MulticastServer extends Thread {
             info.put(types[0].trim(), types[1].trim());
         }
 
-        if(info.get("type").equals("login")){
-            user.sendData(socket, "type | request ; username | " + info.get("username") + " ; NumberRequest | " + number );
+        if(info.get("type").equals("login")){ //"type | login ; username | Miguel ; ccNumber | 1234
+            user.sendData(socket, "type | request ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number );
         }
         else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
-            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
+            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
             number++;
         }
         else if(info.get("type").equals("reserved")){
             System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
         }
         else if(info.get("type").equals("authentication")){
-           // if(h.verifyUser(info.get("username"), info.get("CCNUMBER"), info.get("PASSWORD")) == true){
-                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
-           // }
+            if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD")) == true){
+                System.out.println("BEM VINDO, " + info.get("username") + " !");
+                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient"));
+            }
+            else{
+                System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE SE NA NOSSA PLATAFORMA !");
+            }
         }
         else if(info.get("type").equals("item_listRequire")){
             String lista = "type | item_list ; item_count | " + h.getEstudantes().size() + " ; ";
@@ -66,7 +72,7 @@ public class MulticastServer extends Thread {
                 System.out.println(h.getEstudantes().get(i).nome);
                 lista += "item_" + i + "_name | " + h.getEstudantes().get(i).nome + " ; ";
             }
-            user.sendData(socket, lista + "username | " + info.get("username"));
+            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber"));
         }
     }
 
@@ -75,7 +81,7 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null;
         try {
             System.out.println("================================< " + this.getName() + " >=========================================");
-            InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+            
             ClientRMI client = new ClientRMI(this.getName());
             h.saveClients(this.getName(), (InterfaceClientRMI) client);
             
@@ -85,15 +91,16 @@ public class MulticastServer extends Thread {
 
             while (true) {            
                 dataReceived = receiveData(socket);
-                analyseData(socket, dataReceived, h);
+                analyseData(socket, dataReceived);
             } 
-        } catch (IOException e) { e.printStackTrace();} catch (NotBoundException e) {e.printStackTrace();}
+        } catch (IOException e) { e.printStackTrace();}
     }
 
-    public static void main(String[] args) throws IOException {
-        server = new MulticastServer();  //THREAD RECEBE
+    public static void main(String[] args) throws IOException, NotBoundException {
+        InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+        server = new MulticastServer(h);  //THREAD RECEBE
         server.start();
-        user = new MulticastUser();  //THREAD ENVIA
+        user = new MulticastUser(h);  //THREAD ENVIA
         user.start();
     }
 }
@@ -103,13 +110,15 @@ class MulticastUser extends Thread {
     private int PORT = 7000;
     MulticastServer server;
     boolean verify = false;
+    InterfaceServerRMI h;
 
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastUser() {
+    public MulticastUser(InterfaceServerRMI h) {
         super("SERVER " + (long) (Math.random() * 1000));
+        this.h = h;
     }
 
     public void sendData(MulticastSocket socket, String data) throws IOException{
@@ -147,7 +156,10 @@ class MulticastUser extends Thread {
                     if(teste.equals("1")){
                         System.out.print("NAME: ");
                         String aux = reader.readLine();
-                        sendToServer(socket, "type | login ; username | " + aux );  
+                        System.out.print("CC NUMBER: ");
+                        String cc = reader.readLine();
+                        h.verifyLogin(aux, cc);
+                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc );  
                     }
                 }
             }

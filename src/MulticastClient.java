@@ -51,17 +51,17 @@ public class MulticastClient extends Thread {
             if(user.getName().equals(info.get("terminalID"))){
                 user.sendData(socket, "type | reserved ; IDclient | " + user.getName(), false);
                 state = false;
-                System.out.print("CCNUMBER: ");
-                name = reader.readLine();
-                System.out.print("PASSWORD: ");
+                System.out.print("NOME : " + info.get("username"));
+                System.out.print("\nNUMERO CC : " + info.get("ccNumber"));
+                System.out.print("\nPASSWORD: ");
                 String password = reader.readLine();
-                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; CCNUMBER | " + name + " ; PASSWORD | " + password, false);
+                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password, false);
             }
         }  
-        else if(  info.get("type").equals("vote") && info.get("userData").equals("valid")){
+        else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
             user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") , false);
         }
-        else if( info.get("type").equals("item_list")){
+        else if(info.get("type").equals("item_list")){
             System.out.println("LISTA DE CANDIDATOS");
             for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
                 System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));

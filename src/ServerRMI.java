@@ -193,6 +193,15 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		return false;
 	}
 
+	public boolean verifyLogin(String nome, String ccNumber) throws RemoteException {
+		for(int i = 0; i< person.size(); i++){
+			if(person.get(i).nome.equals(nome) && person.get(i).CCnumber.equals(ccNumber)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static void main(String args[]) throws IOException, InterruptedException {
 		String a;
 		DatagramSocket aSocket = null;
