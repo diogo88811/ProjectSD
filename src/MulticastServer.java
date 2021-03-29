@@ -1,6 +1,5 @@
 import java.net.MulticastSocket;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -51,7 +50,7 @@ public class MulticastServer extends Thread {
             user.sendData(socket, "type | request ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
         }
         else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
-            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
+            user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; terminalID | " + info.get("IDclient") );
             number++;
         }
         else if(info.get("type").equals("reserved")){
@@ -61,7 +60,7 @@ public class MulticastServer extends Thread {
         }
         else if(info.get("type").equals("authentication")){
             if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD")) == true){
-                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
+                user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; terminalID | " + info.get("IDclient") + " ; userData | valid");
             }
             else{
                 System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE SE NA NOSSA PLATAFORMA !");
@@ -84,7 +83,7 @@ public class MulticastServer extends Thread {
             for(int i = 0; i< Integer.parseInt(info.get("tamanhoLista")); i++){
                 lista += "item_" + i + "_name | " + listaEleicao.get(i).getNomeLista() + " ; ";
             }
-            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho"));
+            user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho") + " ; terminalID | " + info.get("IDclient") );
         }
         else if(info.get("type").equals("done")){
             h.print_on_server("USER " + info.get("username") + " VOTOU EM " +  info.get("voto"));

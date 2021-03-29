@@ -18,7 +18,7 @@ public class MulticastClient extends Thread {
     HashMap<String, String> info = new HashMap<String, String>();
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
-    String name;
+    Scanner keyboardScanner = new Scanner(System.in);
 
     
     public MulticastClient() {
@@ -49,20 +49,20 @@ public class MulticastClient extends Thread {
         
         else if(info.get("type").equals("reserve")){
             if(user.getName().equals(info.get("terminalID"))){
-                user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                user.sendData(socket, "type | reserved ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; IDclient | " + user.getName() + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
                 state = false;
                 System.out.print("NOME : " + info.get("username"));
                 System.out.print("\nNUMERO CC : " + info.get("ccNumber"));
                 System.out.print("\nPASSWORD: ");
                 String password = reader.readLine();
-                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
             }
         }  
-        
+
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
             if(user.getName().equals(info.get("terminalID"))){
                 System.out.println("\nBEM VINDO, " + info.get("username") + " !\n");
-                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
+                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"), false);
             }
         }
         
@@ -72,8 +72,13 @@ public class MulticastClient extends Thread {
                 for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
                     System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
                 }
+            
+                int voto = keyboardScanner.nextInt();
+                user.sendData(socket, "type | done ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; voto | " + info.get("item_" + voto + "_name"), false);
+                state = true;
             }
         }
+        
     }
 
     public void run() {
