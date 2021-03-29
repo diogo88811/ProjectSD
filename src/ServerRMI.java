@@ -49,7 +49,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		return this.clients;
 	}
 
-	public static void loadDataElection() throws RemoteException {
+	public  void loadDataElection() throws RemoteException {
 		System.out.println("Getting data....");
 		try {
 			FileInputStream fin = new FileInputStream("eleicao.txt");
@@ -196,7 +196,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 				for(int j = 0; j < l.size(); j++){
 					if(l.get(j).getNomeLista().equals(lista)){
 						l.get(j).setNumVotes((l.get(j).getNumVotes() + 1));
-						//loadDataElection(); // sempre que alguem vota adiciona o voto
 						flag = true;
 					}
 				}
@@ -207,8 +206,20 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			System.out.println("Em branco ou nulo");
 		}
 
-		System.out.println(eleicao);
-		System.out.println(lista);
+		try {
+
+
+			OutputStream fout = new FileOutputStream("eleicao.txt");
+			ObjectOutput oout = new ObjectOutputStream(fout);
+
+			oout.writeObject(eleicoes);
+			oout.close();
+			System.out.println("MESA DE VOTO CRIADA COM SUCESSO !");
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
 
 	}
 
@@ -277,7 +288,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
 
-			loadDataElection();
+			h.loadDataElection();
 
 			//System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			System.out.println("======================RMI SERVER READY!======================");

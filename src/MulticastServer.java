@@ -1,3 +1,4 @@
+import java.net.ConnectException;
 import java.net.MulticastSocket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -28,6 +29,7 @@ public class MulticastServer extends Thread {
 
     public MulticastServer(InterfaceServerRMI h) {
         super("SERVER " + (long) (Math.random() * 1000));
+
         this.h = h;
     }
 
@@ -60,6 +62,7 @@ public class MulticastServer extends Thread {
 
         }
         else if(info.get("type").equals("authentication")){
+
             if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD")) == true){
                 user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista"));
             }
@@ -114,10 +117,10 @@ public class MulticastServer extends Thread {
 
     public static void main(String[] args) throws IOException, NotBoundException {
         InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
-        server = new MulticastServer(h);  //THREAD RECEBE
-        server.start();
-        user = new MulticastUser(h);  //THREAD ENVIA
-        user.start();
+            server = new MulticastServer(h);  //THREAD RECEBE
+            server.start();
+            user = new MulticastUser(h);  //THREAD ENVIA
+            user.start();
     }
 }
 
@@ -179,9 +182,11 @@ class MulticastUser extends Thread {
                     sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho);
                 }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
-        }  finally {
+        }
+        finally {
             socket.close();
         }
     }
