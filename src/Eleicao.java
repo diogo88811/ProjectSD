@@ -1,7 +1,10 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -75,6 +78,9 @@ public class Eleicao implements Serializable {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         String in;
+        int numberOfLists;
+        int numCandidate;
+        Scanner scan = new Scanner(System.in);
 
         System.out.print("NOME ELEICAO: ");
         in = reader.readLine();
@@ -92,8 +98,35 @@ public class Eleicao implements Serializable {
         in = reader.readLine();
         this.publicoAlvo = in;
 
+        System.out.println("NUMERO DE LISTAS: ");
+        numberOfLists = scan.nextInt();
+
         Lista l = new Lista();
-        l.setCandidatoPrincipal(pessoa.get(0));
+        for(int i = 0; i < numberOfLists; i++){
+            System.out.println("LISTA "+(i+1)+":");
+            System.out.print("NOME DA LISTA: ");
+            in = reader.readLine();
+            l.setNomeLista(in);
+            System.out.println("CANDIDATO PRINCIPAL: ");
+            for(int k = 0; k < pessoa.size(); k++){
+                System.out.println(k+" "+pessoa.get(k).getNome());
+            }
+            numCandidate = scan.nextInt();
+            l.setCandidatoPrincipal(pessoa.get(numCandidate));
+            while(true) {
+                for (int k = 0; k < pessoa.size(); k++) {
+                    if(!(l.getPessoas().contains(pessoa.get(k))))
+                        System.out.println((k+1) + " " + pessoa.get(k).getNome());
+                }
+                numCandidate = scan.nextInt();
+                if(numCandidate != 0) {
+                    l.getPessoas().add(pessoa.get(numCandidate - 1));
+                }else{
+                    break;
+                }
+            }
+        }
+
         this.listas.add(l);
         this.estado = true;
 
