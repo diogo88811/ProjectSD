@@ -1,5 +1,9 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Lista implements Serializable  {
     /**
@@ -75,6 +79,38 @@ public class Lista implements Serializable  {
             System.out.println("OUTRAS PESSOAS DA LISTA: ");
             for(Pessoa p : this.getPessoas()){
                 System.out.println(p.getNome());
+            }
+        }
+    }
+
+    public void createList(ArrayList<Pessoa> pessoa) throws IOException {
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+        String in;
+        Scanner scan = new Scanner(System.in);
+
+        System.out.print("NOME DA LISTA: ");
+        in = reader.readLine();
+        this.nomeLista = in;
+
+        System.out.println("CANDIDATO PRINCIPAL: ");
+        for(int k = 0; k < pessoa.size(); k++){
+            System.out.println(k+" "+pessoa.get(k).getNome());
+        }
+
+        int numCandidate = scan.nextInt();
+        this.candidatoPrincipal = pessoa.get(numCandidate);
+
+        while(true) {
+            for (int k = 0; k < pessoa.size(); k++) {
+                if(!(this.getPessoas().contains(pessoa.get(k))))
+                    System.out.println((k+1) + " " + pessoa.get(k).getNome());
+            }
+            numCandidate = scan.nextInt();
+            if(numCandidate != 0) {
+                this.getPessoas().add(pessoa.get(numCandidate - 1));
+            }else{
+                break;
             }
         }
     }

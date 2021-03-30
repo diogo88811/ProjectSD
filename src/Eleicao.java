@@ -127,4 +127,9 @@ public class Eleicao implements Serializable {
         }
         this.estado = true;
     }
+
+    public void addList(Lista l) throws IOException{
+        System.out.println("Here adicionei lista ");
+        this.listas.add(l);
+    }
 }
