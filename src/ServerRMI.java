@@ -162,6 +162,34 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		return;
 	}
 
+	public void gerirEleicao(Lista l, int eleNum,int opt,int indexLi) throws IOException {
+			if(opt == 2){
+				eleicoes.get(eleNum).getListas().add(l);
+				OutputStream fout = new FileOutputStream("eleicao.txt");
+				ObjectOutput oout = new ObjectOutputStream(fout);
+				oout.writeObject(eleicoes);
+				oout.close();
+			}
+			else if(opt == 1){
+				eleicoes.get(eleNum).getListas().remove(indexLi);
+				eleicoes.get(eleNum).getListas().add(l);
+				OutputStream fout = new FileOutputStream("eleicao.txt");
+				ObjectOutput oout = new ObjectOutputStream(fout);
+				oout.writeObject(eleicoes);
+				oout.close();
+			}
+
+	}
+
+	public void alteraEleicao(Eleicao e, int numEle) throws IOException {
+		eleicoes.remove(numEle);
+		eleicoes.add(e);
+		OutputStream fout = new FileOutputStream("eleicao.txt");
+		ObjectOutput oout = new ObjectOutputStream(fout);
+		oout.writeObject(eleicoes);
+		oout.close();
+	}
+
 	public void criarEleicao(Eleicao eleicao) throws RemoteException {
 
 		try {

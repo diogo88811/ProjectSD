@@ -75,9 +75,10 @@ public class Eleicao implements Serializable {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         String in;
+        Scanner scan = new Scanner(System.in);
         int numberOfLists;
         int numCandidate;
-        Scanner scan = new Scanner(System.in);
+
 
         System.out.print("NOME ELEICAO: ");
         in = reader.readLine();
@@ -128,8 +129,21 @@ public class Eleicao implements Serializable {
         this.estado = true;
     }
 
-    public void addList(Lista l) throws IOException{
-        System.out.println("Here adicionei lista ");
-        this.listas.add(l);
+    public void changeEle() throws IOException {
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+        Scanner scan = new Scanner(System.in);
+        String in;
+
+        System.out.println("SELECIONE A OPCAO QUE PERTENDE ALTERAR");
+        System.out.println("<1> ALTERAR O NOME: ");
+        int opt = scan.nextInt();
+        switch (opt){
+            case 1:
+                System.out.println("INSIRA O NOVO NOME: ");
+                in = reader.readLine();
+                this.nome = in;
+                break;
+        }
     }
 }

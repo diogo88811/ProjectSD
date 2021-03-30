@@ -1,3 +1,5 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -112,6 +114,36 @@ public class Lista implements Serializable  {
             }else{
                 break;
             }
+        }
+    }
+    public void modifyList(ArrayList<Pessoa> pessoas) throws IOException {
+        Scanner scan = new Scanner(System.in);
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+        System.out.println("<1> MUDAR NOME: ");
+        System.out.println("<2> MUDAR CANDIDATO PRINCIPAL: ");
+        System.out.println("<3> REMOVER PESSOAS: ");
+        System.out.println("<4> ADICIONAR PESSOAS: ");
+        int numOpt = scan.nextInt();
+        String in = null;
+        switch (numOpt){
+            case 1:
+                System.out.println("INTRODUZA O NOME: ");
+                in = reader.readLine();
+                this.nomeLista = in;
+                break;
+            case 2:
+                System.out.println("CANDIDATO PRINCIPAL: " + this.getCandidatoPrincipal().getNome());
+                System.out.println("SELECIONE OUTRO: ");
+                for(int i = 0; i < pessoas.size(); i++){
+                    if(pessoas.get(i) != this.getCandidatoPrincipal()){
+                        System.out.println(i + " "+ pessoas.get(i).getNome());
+                    }
+                }
+                int numCand = scan.nextInt();
+                this.candidatoPrincipal = pessoas.get(numCand);
+                break;
+
         }
     }
 }

@@ -50,6 +50,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 				System.out.println("<1> REGISTAR PESSOA");
 				System.out.println("<2> CRIAR ELEICAO");
 				System.out.println("<3> GERIR CANDIDATOS A UMA ELEICAO ");
+				System.out.println("<4> ALTERAR PROPRIEDADES DE UMA ELEICAO");
 				System.out.println("<4> GERIR MESAS DE VOTOS");
 				System.out.print(">");
 				menuOption = scan.nextInt();
@@ -89,18 +90,45 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						for(int i = 0; i < election.size(); i++){
 							System.out.println("<" + i +"> " + election.get(i).getNome());
 						}
-						int listnum = scan.nextInt();
-						ArrayList<Lista> li = election.get(listnum).getListas();
+						int eleNum = scan.nextInt();
 
-						System.out.println("LISTAS PRESENTES NA ELEIÇÂO");
-						for(int i = 0; i < li.size(); i++){
-							System.out.println("<" + i +"> " + li.get(i).getNomeLista());
+						System.out.println("SELECIONE UMA OPCAO: ");
+						System.out.println("<1> MODIFICAR LISTA: ");
+						System.out.println("<2> ADICIONAR LISTA: ");
+						int opt = scan.nextInt();
+						if(opt == 1){
+							System.out.println("SELECIONE A LISTA: ");
+							for(int i = 0; i < election.get(eleNum).getListas().size(); i++){
+								System.out.println(i + " "+ election.get(eleNum).getListas().get(i).getNomeLista());
+							}
+
+							int numList = scan.nextInt();
+							Lista l = election.get(eleNum).getListas().get(numList);
+							l.modifyList(h.getEstudantes());
+							h.gerirEleicao(l,eleNum,opt,numList);
+
 						}
-						listnum = scan.nextInt();
-						li.get(listnum).manageCandidateList();
+						else if(opt == 2){
+							Lista l = new Lista();
+							l.createList(h.getEstudantes());
+							h.gerirEleicao(l,eleNum,opt,0);
+						}
 
 						break;
-
+					case 4:
+						//só mostrar eleicaoes que aindam não comecaram
+						//so as que não começaram podem ser alteradas
+						System.out.println("SELECIONE A ELEICAO: ");
+						for(int i = 0; i < h.getEleicoes().size(); i++){
+							//if para verificar se a eleição já acabou
+							//adicionando flag de acabou na classe eleicao
+							//fazer depois com o tempo
+							System.out.println(i + " " + h.getEleicoes().get(i).getNome());
+						}
+						int numEle = scan.nextInt();
+						Eleicao el = h.getEleicoes().get(numEle);
+						el.changeEle();
+						h.alteraEleicao(el,numEle);
 				}
 			}
 

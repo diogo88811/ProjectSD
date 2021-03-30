@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.rmi.Remote;
@@ -19,4 +20,6 @@ public interface InterfaceServerRMI extends Remote{
 	public void saveVotes(String eleicao, String lista) throws RemoteException;
 	public void loadDataElection() throws RemoteException;
 	public void notifyClient(String name, String tag) throws RemoteException;
-	}
+	public void gerirEleicao(Lista l, int eleNum,int opt,int indexLi)throws RemoteException, IOException;
+	public void alteraEleicao(Eleicao e, int numEle) throws RemoteException, IOException;
+}
