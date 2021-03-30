@@ -1,4 +1,5 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -37,12 +38,12 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 		BufferedReader reader = new BufferedReader(input);
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
-
 		try {
 
 			InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
 			ClientRMI client = new ClientRMI(args[0]);
-			h.saveClients(args[0], (InterfaceClientRMI) client);
+			h.saveAdmin(args[0], (InterfaceClientRMI) client);
+
 
 			while (true) {
 				System.out.println("======================ADMIN CONSOLE!======================");
@@ -85,32 +86,18 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						}
 
 						System.out.println("SELECIONE UMA ELEICAO\n> ");
-						for(int i = 0; i < h.getEleicoes().size(); i++){
-							System.out.println("<" + i +"> " + h.getEleicoes().get(i).getNome());
+						for(int i = 0; i < election.size(); i++){
+							System.out.println("<" + i +"> " + election.get(i).getNome());
 						}
-						int eleNum = scan.nextInt();
+						int listnum = scan.nextInt();
+						ArrayList<Lista> li = election.get(listnum).getListas();
 
-
-						System.out.println("SELECIONE UMA OPCAO: ");
-						System.out.println("<1> MODIFICAR LISTA: ");
-						System.out.println("<2> ADICIONAR LISTA: ");
-						int opt = scan.nextInt();
-						if(opt == 1){
-							System.out.println("LISTAS PRESENTES NA ELEIÇÂO");
-							for(int i = 0; i < h.getEleicoes().get(eleNum).getListas().size(); i++){
-								System.out.println("<" + i +"> " + h.getEleicoes().get(eleNum).getListas().get(i).getNomeLista());
-							}
-							int listnum = scan.nextInt();
-							h.getEleicoes().get(eleNum).getListas().get(listnum).manageCandidateList();
+						System.out.println("LISTAS PRESENTES NA ELEIÇÂO");
+						for(int i = 0; i < li.size(); i++){
+							System.out.println("<" + i +"> " + li.get(i).getNomeLista());
 						}
-						else if(opt == 2){
-							Lista l = new Lista();
-							l.createList(h.getEstudantes());
-							//funçao no server RMI para adicionar uma LISTA.
-							// exemplo --- > h.addLISTA
-							h.getEleicoes().get(eleNum).getListas().add(l);
-
-						}
+						listnum = scan.nextInt();
+						li.get(listnum).manageCandidateList();
 
 						break;
 

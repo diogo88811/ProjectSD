@@ -58,7 +58,7 @@ public class MulticastClient extends Thread {
                 String password = null;
 
                 long sTime = System.currentTimeMillis();
-                while (System.currentTimeMillis() - sTime < 5000){
+                while (System.currentTimeMillis() - sTime < 60000){
                     if (System.in.available() > 0){
                         password = keyboardScanner.nextLine();
                         user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);

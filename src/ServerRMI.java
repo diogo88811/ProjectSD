@@ -19,7 +19,9 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	static ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>();
 	static ArrayList<Pessoa> person = new ArrayList<Pessoa>();
 	static ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
+	static ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
 	static ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
+
 
 	public ServerRMI() throws RemoteException {
 		super();
@@ -46,6 +48,10 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	}
 
 	public ArrayList<InterfaceClientRMI> getClients() throws RemoteException {
+		return this.clients;
+	}
+
+	public ArrayList<InterfaceClientRMI> getAdminClients() throws RemoteException {
 		return this.clients;
 	}
 
@@ -179,6 +185,11 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		clients.add(a);
 	}
 
+	public void saveAdmin(String name, InterfaceClientRMI a) throws RemoteException {
+		System.out.println("CONNECTED WITH " + name);
+		clientsAdmin.add(a);
+	}
+
 	public void print_on_server(String s) throws RemoteException {
 		System.out.println("> " + s);
 	}
@@ -240,6 +251,13 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		return false;
 	}
 
+	public void notifyClient(String name, String tag) throws RemoteException{
+
+		for(int i = 0; i<clientsAdmin.size(); i++){
+			clientsAdmin.get(i).print_on_client(name + tag);
+		}
+	}
+
 	public static void main(String args[]) throws IOException, InterruptedException {
 		String a;
 		DatagramSocket aSocket = null;
@@ -248,7 +266,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 		while(true){
 			try{
-
 				aSocket = new DatagramSocket();
 				System.out.println("ping");
 				InetAddress host = InetAddress.getByName("127.0.0.1");
@@ -295,7 +312,9 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			while (true) {
 				System.out.print("> ");
 				a = reader.readLine();
-				h.clients.get(0).print_on_client(a);
+				for(int i = 0; i<clientsAdmin.size(); i++){
+					h.clientsAdmin.get(i).print_on_client(a);
+				}
 			}
 		} catch (RemoteException re) {
 			System.out.println("Exception in HelloImpl.main: " + re);
