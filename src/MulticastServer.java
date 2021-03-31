@@ -1,14 +1,21 @@
-import java.net.ConnectException;
 import java.net.MulticastSocket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -24,11 +31,13 @@ public class MulticastServer extends Thread {
     int number = 0;
     boolean state = true;
     InterfaceServerRMI h;
+    TimeCount time;
 
     
-    public MulticastServer(InterfaceServerRMI h) {
+    public MulticastServer(InterfaceServerRMI h, TimeCount time) {
         super("SERVER " + (long) (Math.random() * 1000));
         this.h = h;
+        this.time = time;
     }
 
     public String receiveData(MulticastSocket socket) throws IOException{
@@ -128,28 +137,33 @@ public class MulticastServer extends Thread {
 
     public static void main(String[] args) throws IOException, NotBoundException {
         InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
-        server = new MulticastServer(h);  //THREAD RECEBE
+        TimeCount time = new TimeCount();
+        time.start();
+        server = new MulticastServer(h, time);  //THREAD RECEBE
         server.start();
-        user = new MulticastUser(h, server);  //THREAD ENVIA
+        user = new MulticastUser(h, server, time);  //THREAD ENVIA
         user.start();
         Runtime.getRuntime().addShutdownHook(new RuntimeDemo(h, server));
     }
 }
+
 class MulticastUser extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.1";
     private int PORT = 7000;
     MulticastServer server;
     boolean verify = false;
     InterfaceServerRMI h;
+    TimeCount time;
 
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastUser(InterfaceServerRMI h, MulticastServer server) {
+    public MulticastUser(InterfaceServerRMI h, MulticastServer server, TimeCount time) {
         super("SERVER " + (long) (Math.random() * 1000));
         this.h = h;
         this.server = server;
+        this.time = time;
     }
 
     public void sendData(MulticastSocket socket, String data) throws IOException{
@@ -197,7 +211,7 @@ class MulticastUser extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
         finally {
             socket.close();
         }
@@ -205,6 +219,7 @@ class MulticastUser extends Thread {
 }
 
 class RuntimeDemo extends Thread{
+
     InterfaceServerRMI h ;
     MulticastServer server;
 
@@ -217,6 +232,23 @@ class RuntimeDemo extends Thread{
             h.notifyClient("MESA " + server.getName(), " -> off");
         } catch (RemoteException e) {
             System.out.println("ERRO!");
+        }
+    }
+}
+
+class TimeCount extends Thread{
+    String hour, minute, second;
+  
+    public void run(){
+        while(true){
+            LocalDateTime agora = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String agoraFormatado = agora.format(formatter);
+
+            String []todayTime = agoraFormatado.split(":");
+            hour = todayTime[0];
+            minute = todayTime[1];
+            second = todayTime[2];
         }
     }
 }
