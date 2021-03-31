@@ -51,7 +51,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 				System.out.println("<2> CRIAR ELEICAO");
 				System.out.println("<3> GERIR CANDIDATOS A UMA ELEICAO ");
 				System.out.println("<4> ALTERAR PROPRIEDADES DE UMA ELEICAO");
-				System.out.println("<4> GERIR MESAS DE VOTOS");
+				System.out.println("<5> CONSULTAR DADOS DAS ANTIGAS ELEICOES");
 				System.out.print(">");
 				menuOption = scan.nextInt();
 				switch(menuOption){
@@ -70,10 +70,12 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						try{
 							eleicao.createEleicao(h.getEstudantes());
 							h.criarEleicao(eleicao);
+							h.stateOfElections(); // teste
 						}catch (Exception e){
 							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
 							eleicao.createEleicao(h.getEstudantes());
 							h.criarEleicao(eleicao);
+							h.stateOfElections(); //teste
 						}
 						break;
 					case 3:
@@ -157,6 +159,19 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							h.alteraEleicao(el,numEle);
 						}
 
+						break;
+
+					case 5:
+						//eleicoes que já tenham terminado
+						System.out.println("SELECIONE UMA ELEICAO");
+						for(int i = 0; i < h.getEleicoes().size(); i++){
+							System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+						}
+						int numEle = scan.nextInt();
+						System.out.println("DADOS:");
+						for(int i = 0; i < h.getEleicoes().get(numEle).getListas().size(); i++){
+							System.out.println(h.getEleicoes().get(numEle).getListas().get(i).getNomeLista()+ " NUMERO DE VOTO: "+h.getEleicoes().get(numEle).getListas().get(i).getNumVotes());
+						}
 						break;
 				}
 			}

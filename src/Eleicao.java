@@ -138,12 +138,24 @@ public class Eleicao implements Serializable {
 
         System.out.println("SELECIONE A OPCAO QUE PERTENDE ALTERAR");
         System.out.println("<1> ALTERAR O NOME: ");
+        System.out.println("<2> MUDAR DATA INICIAL: ");
+        System.out.println("<2> MUDAR DATA FINAL: ");
         int opt = scan.nextInt();
         switch (opt){
             case 1:
                 System.out.println("INSIRA O NOVO NOME: ");
                 in = reader.readLine();
                 this.nome = in;
+                break;
+            case 2:
+                System.out.println("INISRA A DATA: ");
+                in = reader.readLine();
+                this.DataInicio  = in;
+                break;
+            case 3:
+                System.out.println("INISRA A DATA: ");
+                in = reader.readLine();
+                this.DataFim  = in;
                 break;
         }
     }

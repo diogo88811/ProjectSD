@@ -7,7 +7,13 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.*;
+import java.sql.SQLOutput;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI {
 	/**
@@ -21,6 +27,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	static ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
 	static ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
 	static ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
+	private Object DateTimeFormat;
 
 
 	public ServerRMI() throws RemoteException {
@@ -222,10 +229,33 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
-	public void stateOfElections()throws RemoteException{
+	public void stateOfElections() throws RemoteException, ParseException {
 		for(int i = 0; i < eleicoes.size(); i++){
 			String dataInicial = eleicoes.get(i).getDataInicio();
 			String datafinal = eleicoes.get(i).getDataFim();
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date inicial = sdf.parse(dataInicial);
+			Date fina = sdf.parse(datafinal);
+
+			Date now = new Date();
+			String strDate = sdf.format(now);
+			Date actual = sdf.parse(strDate);
+
+			System.out.println("DATA INICIAL COM A ATUAL");
+			if(inicial.before(actual)){
+				System.out.println("inicial é antes");
+			}
+			else{
+				System.out.println("inicial é depois");
+			}
+
+			System.out.println("DATA final COM A ATUAL");
+			if(fina.before(actual)){
+				System.out.println("final é antes");
+			}
+			else{
+				System.out.println("final é depois");
+			}
 		}
 	}
 
