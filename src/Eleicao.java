@@ -12,10 +12,10 @@ public class Eleicao implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     public String nome, DataInicio, DataFim, publicoAlvo;
-    boolean estado;
+    int estado;
     public ArrayList<Lista> listas = new ArrayList<Lista>();
     
-    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, boolean estado,ArrayList<Lista> listas){
+    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, int estado,ArrayList<Lista> listas){
         this.nome = nome;
         this.DataInicio = DataInicio;
         this.DataFim = DataFim;
@@ -38,7 +38,7 @@ public class Eleicao implements Serializable {
     public void setDataInicio(String DataInicio) {
         this.DataInicio = DataInicio;
     }
-    public boolean getEstado(){
+    public int getEstado(){
         return this.estado;
     }
     public String getDataFim() {
@@ -126,7 +126,8 @@ public class Eleicao implements Serializable {
             l.setNumVotes(0);
             this.listas.add(l);
         }
-        this.estado = true;
+        //funcao para verificar se a a eleicao já começou
+        this.estado = 0;
     }
 
     public void changeEle() throws IOException {

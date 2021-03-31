@@ -48,7 +48,7 @@ public class MulticastServer extends Thread {
         return message;
     }
 
-    public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException{
+    public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException, NotBoundException {
 
         String aux[] = data.split("[;]");
         for(String a : aux){
@@ -76,13 +76,27 @@ public class MulticastServer extends Thread {
         }
         else if(info.get("type").equals("authentication")){
             if(user.getName().equals(info.get("serverName"))){
-                if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD")) == true){
-                    user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
+                try {
+
+                    if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD"))){
+                        user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
+                    }
+                    else{
+                        System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE-SE NA NOSSA PLATAFORMA !");
+                        user.sendData(socket, "type | restart ; state | true" + " ; terminalID | " + info.get("IDclient") + " ; serverName | " + user.getName());
+                    }
+                }catch (Exception e){
+
+                    h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                    if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD"))){
+                        user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
+                    }
+                    else{
+                        System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE-SE NA NOSSA PLATAFORMA !");
+                        user.sendData(socket, "type | restart ; state | true" + " ; terminalID | " + info.get("IDclient") + " ; serverName | " + user.getName());
+                    }
                 }
-                else{
-                    System.out.println("UTILIZADOR NAO ESTA REGISTADO, POR FAVOR REGISTE-SE NA NOSSA PLATAFORMA !");
-                    user.sendData(socket, "type | restart ; state | true" + " ; terminalID | " + info.get("IDclient") + " ; serverName | " + user.getName());
-                }
+
             }
         }
         else if(info.get("type").equals("item_listRequire")){
@@ -107,9 +121,17 @@ public class MulticastServer extends Thread {
         }
         else if(info.get("type").equals("done")){
             if(user.getName().equals(info.get("serverName"))){
-                h.saveVotes(info.get("eleicao"),info.get("voto"));
-                h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
-                state = true;
+                try{
+                    h.saveVotes(info.get("eleicao"),info.get("voto"));
+                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    state = true;
+                }catch (Exception e){
+                    h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                    h.saveVotes(info.get("eleicao"),info.get("voto"));
+                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    state = true;
+                }
+
             }
         }
     }
@@ -120,8 +142,15 @@ public class MulticastServer extends Thread {
             System.out.println("================================< " + this.getName() + " >=========================================");
 
             ClientRMI client = new ClientRMI(this.getName());
-            h.saveClients(this.getName(), (InterfaceClientRMI) client);
-            h.notifyClient("MESA " + this.getName(), " -> on");
+            try{
+                h.saveClients(this.getName(), (InterfaceClientRMI) client);
+                h.notifyClient("MESA " + this.getName(), " -> on");
+            }catch (Exception e ){
+                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                h.saveClients(this.getName(), (InterfaceClientRMI) client);
+                h.notifyClient("MESA " + this.getName(), " -> on");
+            }
+
 
             socket = new MulticastSocket(PORT);
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -132,7 +161,7 @@ public class MulticastServer extends Thread {
                 dataReceived = receiveData(socket);
                 analyseData(socket, dataReceived, info);
             }
-        } catch (IOException e) { e.printStackTrace();}
+        } catch (IOException | NotBoundException e) { e.printStackTrace();}
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
@@ -196,20 +225,40 @@ class MulticastUser extends Thread {
                     String aux = reader.readLine();
                     System.out.print("CC NUMBER: ");
                     String cc = reader.readLine();
-                    h.verifyLogin(aux, cc);
-                    System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
-
-                    for(int i = 0; i< h.getEleicoes().size(); i++){
-                        System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                    try{
+                        h.verifyLogin(aux, cc);
+                    }catch (Exception e){
+                        h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                        h.verifyLogin(aux, cc);
                     }
-                    int numEleicoes = keyboardScanner.nextInt();
-                    String eleicao =  h.getEleicoes().get(numEleicoes).getNome();
-                    int tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
 
-                    sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                    System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
+                    String eleicao;
+                    int tamanho;
+                    try{
+                        for(int i = 0; i< h.getEleicoes().size(); i++){
+                            System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                        }
+                        int numEleicoes = keyboardScanner.nextInt();
+                        eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                        tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                    }catch (Exception e){
+                        h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                        for(int i = 0; i< h.getEleicoes().size(); i++){
+                            System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                        }
+                        int numEleicoes = keyboardScanner.nextInt();
+                        eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                        tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                    }
+
+
+
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | NotBoundException e) {
             e.printStackTrace();
         } 
         finally {

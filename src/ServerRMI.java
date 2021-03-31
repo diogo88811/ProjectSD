@@ -222,6 +222,13 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
+	public void stateOfElections()throws RemoteException{
+		for(int i = 0; i < eleicoes.size(); i++){
+			String dataInicial = eleicoes.get(i).getDataInicio();
+			String datafinal = eleicoes.get(i).getDataFim();
+		}
+	}
+
 	public void saveVotes(String eleicao, String lista) throws RemoteException{
 		//eleicao
 		//lista em que votou

@@ -22,4 +22,5 @@ public interface InterfaceServerRMI extends Remote{
 	public void notifyClient(String name, String tag) throws RemoteException;
 	public void gerirEleicao(Lista l, int eleNum,int opt,int indexLi)throws RemoteException, IOException;
 	public void alteraEleicao(Eleicao e, int numEle) throws RemoteException, IOException;
+	public void stateOfElections()throws RemoteException;
 }
