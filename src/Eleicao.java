@@ -14,14 +14,16 @@ public class Eleicao implements Serializable {
     public String nome, DataInicio, DataFim, publicoAlvo;
     int estado;
     public ArrayList<Lista> listas = new ArrayList<Lista>();
+    public ArrayList<Pessoa> peopleWhoVoted = new ArrayList<Pessoa>();
     
-    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, int estado,ArrayList<Lista> listas){
+    public Eleicao(String nome, String DataInicio, String DataFim, String publicoAlvo, int estado,ArrayList<Lista> listas, ArrayList<Pessoa> peopleWhoVoted){
         this.nome = nome;
         this.DataInicio = DataInicio;
         this.DataFim = DataFim;
         this.publicoAlvo = publicoAlvo;
         this.estado = estado;
         this.listas = listas;
+        this.peopleWhoVoted = peopleWhoVoted;
     }
     public  Eleicao(){
 
@@ -56,6 +58,9 @@ public class Eleicao implements Serializable {
     public ArrayList<Lista> getListas() {
         return listas;
     }
+    public ArrayList<Pessoa> getpeopleWhoVoted(){
+        return this.peopleWhoVoted;
+    }
     public void setListas(ArrayList<Lista> listas) {
         this.listas = listas;
     }
@@ -68,6 +73,7 @@ public class Eleicao implements Serializable {
                 ", publicoAlvo='" + publicoAlvo + '\'' +
                 ", estado=" + estado +
                 ", listas=" + listas +
+                ", votantes= " + peopleWhoVoted +
                 '}';
     }
 

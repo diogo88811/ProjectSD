@@ -57,10 +57,12 @@ public class MulticastClient extends Thread {
                 System.out.print("\nPASSWORD: ");
                 String password = null;
 
+                Scanner sc = new Scanner(System.in);
+
                 long sTime = System.currentTimeMillis();
                 while (System.currentTimeMillis() - sTime < 60000){
                     if (System.in.available() > 0){
-                        password = keyboardScanner.nextLine();
+                        password = sc.nextLine();
                         user.sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
                         break;
                     }
@@ -75,7 +77,7 @@ public class MulticastClient extends Thread {
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
             if(user.getName().equals(info.get("terminalID"))){
                 System.out.println("\nBEM VINDO, " + info.get("username") + " !\n");
-                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+                user.sendData(socket, "type | item_listRequire ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") +  " ; IDclient | " + user.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
             }
         }
 
@@ -86,10 +88,24 @@ public class MulticastClient extends Thread {
                     System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
                 }
 
-                int voto = keyboardScanner.nextInt();
-                user.sendData(socket, "type | done ; username | " + info.get("username") + " ; IDclient | " + user.getName() + " ; voto | " + info.get("item_" + voto + "_name") + " ; serverName | " + info.get("serverName"), false);
-                state = true;
-                System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+                String auxVoto = null;
+                Scanner scan = new Scanner(System.in);
+
+                long sTime = System.currentTimeMillis();
+                while (System.currentTimeMillis() - sTime < 60000){
+                    if (System.in.available() > 0){
+                        auxVoto = scan.nextLine();
+                        user.sendData(socket, "type | done ; IDclient | " + info.get("username")  + " ; voto | " + info.get("item_" + Integer.parseInt(auxVoto) + "_name") + " ; serverName | " + info.get("serverName"), false);
+                        user.sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
+                        state = true;
+                        System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+                        break;
+                    }
+                }
+                if(auxVoto == null){
+                    System.out.println("\nERRO NA VOTACAO");
+                    state = true;
+                }
             }
         }
         else if(info.get("type").equals("restart")){

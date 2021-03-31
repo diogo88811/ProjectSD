@@ -200,8 +200,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	public void criarEleicao(Eleicao eleicao) throws RemoteException {
 
 		try {
-
-
 			OutputStream fout = new FileOutputStream("eleicao.txt");
 			ObjectOutput oout = new ObjectOutputStream(fout);
 
@@ -321,6 +319,33 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		for(int i = 0; i<clientsAdmin.size(); i++){
 			clientsAdmin.get(i).print_on_client(name + tag);
 		}
+	}
+
+	public void saveUserVote(String name, String ccNumber, String election) throws RemoteException{
+		System.out.println(name + " " + ccNumber + " " + election);
+		Pessoa aux = null;
+		for(int i = 0; i<person.size(); i++){
+			if(person.get(i).nome.equals(name) && person.get(i).CCnumber.equals(ccNumber)){
+				aux = person.get(i);
+			}
+		}
+		
+		for(int i = 0; i< eleicoes.size(); i++){
+			if(eleicoes.get(i).nome.equals(election)){
+				eleicoes.get(i).getpeopleWhoVoted().add(aux);
+			}
+		}
+		
+	}
+
+	public boolean verifyUserinArray(String name, String ccNUmber, Eleicao election) throws RemoteException{
+		for(int i = 0; i < election.getpeopleWhoVoted().size(); i++){
+			if(election.getpeopleWhoVoted().get(i).getNome().equals(name) && election.getpeopleWhoVoted().get(i).getCCnumber().equals(ccNUmber)){ 
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	public static void main(String args[]) throws IOException, InterruptedException {
