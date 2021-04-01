@@ -61,11 +61,11 @@ public class Lista implements Serializable  {
 
     @Override
     public String toString() {
-        return "Lista{" +
-                "pessoas=" + pessoas +
-                ", candidatoPrincipal=" + candidatoPrincipal +
-                ", nomeLista='" + nomeLista + '\'' +
-                '}';
+        return  "\nListas: " +
+                "\nNome da Lista -> " + nomeLista +
+                "\nNumero de Votos -> " + numVotes +
+                "\nPessoas -> " + pessoas +
+                "\nCandidatoPrincipal -> " + candidatoPrincipal.nome ;
     }
 
 

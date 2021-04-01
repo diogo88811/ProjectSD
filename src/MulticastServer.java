@@ -2,27 +2,20 @@ import java.net.MulticastSocket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
 
 
 public class MulticastServer extends Thread {
 
-    private String MULTICAST_ADDRESS = "224.0.224.0";
+    //"224.0.224.0"
+    private String MULTICAST_ADDRESS;
     private int PORT = 7000;
     private static MulticastServer server;
     private static MulticastUser user;
@@ -33,9 +26,10 @@ public class MulticastServer extends Thread {
     InterfaceServerRMI h;
 
     
-    public MulticastServer(InterfaceServerRMI h) {
-        super("SERVER " + (long) (Math.random() * 1000));
+    public MulticastServer(InterfaceServerRMI h, String MULTICAST_ADDRESS) {
+        super("MESA " + (long) (Math.random() * 1000));
         this.h = h;
+        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
     }
 
     public String receiveData(MulticastSocket socket) throws IOException{
@@ -121,12 +115,16 @@ public class MulticastServer extends Thread {
             if(user.getName().equals(info.get("serverName"))){
                 try{
                     h.saveVotes(info.get("eleicao"),info.get("voto"));
-                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //for(int i = 0; i< h.getAdminClients().size(); i++){
+                        h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //}
                     state = true;
                 }catch (Exception e){
                     h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
                     h.saveVotes(info.get("eleicao"),info.get("voto"));
-                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //for(int i = 0; i< h.getAdminClients().size(); i++){
+                        h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //}
                     state = true;
                 }
             }
@@ -135,10 +133,12 @@ public class MulticastServer extends Thread {
             if(user.getName().equals(info.get("serverName"))){
                 try{
                     h.saveUserVote(info.get("username"), info.get("ccNumber"),info.get("eleicao"));
+                    h.saveVotedPlaceOnPeople(info.get("username"), info.get("ccNumber"), this.getName());
                  
                 }catch(Exception e){
                     h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
                     h.saveUserVote(info.get("username"), info.get("ccNumber"), info.get("eleicao"));
+                    h.saveVotedPlaceOnPeople(info.get("username"), info.get("ccNumber"), this.getName());
                 }
             }
         }
@@ -147,16 +147,15 @@ public class MulticastServer extends Thread {
     public void run() {
         MulticastSocket socket = null;
         try {
-            System.out.println("================================< " + this.getName() + " >=========================================");
-
+            System.out.println("______________________________< " + this.getName() + " >________________________________________");
             ClientRMI client = new ClientRMI(this.getName());
             try{
                 h.saveClients(this.getName(), (InterfaceClientRMI) client);
-                h.notifyClient("MESA " + this.getName(), " -> on");
+                h.notifyClient(this.getName(), " -> on");
             }catch (Exception e ){
                 h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
                 h.saveClients(this.getName(), (InterfaceClientRMI) client);
-                h.notifyClient("MESA " + this.getName(), " -> on");
+                h.notifyClient(this.getName(), " -> on");
             }
             socket = new MulticastSocket(PORT);
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -172,16 +171,17 @@ public class MulticastServer extends Thread {
 
     public static void main(String[] args) throws IOException, NotBoundException {
         InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
-        server = new MulticastServer(h);  //THREAD RECEBE
+        server = new MulticastServer(h, args[0]);  //THREAD RECEBE
         server.start();
-        user = new MulticastUser(h, server);  //THREAD ENVIA
+        user = new MulticastUser(h, server, args[0]);  //THREAD ENVIA
         user.start();
         Runtime.getRuntime().addShutdownHook(new RuntimeDemo(h, server));
     }
 }
 
 class MulticastUser extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.1";
+    // "224.0.224.0"
+    private String MULTICAST_ADDRESS;
     private int PORT = 7000;
     MulticastServer server;
     boolean verify = false;
@@ -191,10 +191,11 @@ class MulticastUser extends Thread {
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastUser(InterfaceServerRMI h, MulticastServer server) {
-        super("SERVER " + (long) (Math.random() * 1000));
+    public MulticastUser(InterfaceServerRMI h, MulticastServer server, String MULTICAST_ADDRESS) {
+        super("MESA " + (long) (Math.random() * 1000));
         this.h = h;
         this.server = server;
+        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
     }
 
     public void sendData(MulticastSocket socket, String data) throws IOException{
@@ -216,6 +217,9 @@ class MulticastUser extends Thread {
     public void run() {
         MulticastSocket socket = null;
         try {
+            sleep(1000);
+            System.out.print("\nIDENTIFICA O DEPARTAMENTO DESTA MESA DE VOTO: ");
+            String dep = reader.readLine();
             socket = new MulticastSocket();
             System.out.println("<1> - LOGIN NA MESA DE VOTO");
             while (true) {
@@ -264,6 +268,9 @@ class MulticastUser extends Thread {
             }
         } catch (IOException | NotBoundException e) {
             e.printStackTrace();
+        } catch (InterruptedException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         } 
         finally {
             socket.close();

@@ -26,4 +26,5 @@ public interface InterfaceServerRMI extends Remote{
 	public void stateOfElections() throws RemoteException, ParseException;
 	public void saveUserVote(String name, String ccNumber, String election) throws RemoteException;
 	public boolean verifyUserinArray(String name, String ccNUmber, Eleicao election) throws RemoteException;
+	public void saveVotedPlaceOnPeople(String name, String ccNumber, String table) throws RemoteException;
 	}

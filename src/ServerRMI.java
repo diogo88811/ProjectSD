@@ -7,11 +7,9 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.*;
-import java.sql.SQLOutput;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -20,13 +18,13 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	static ArrayList<Pessoa> Estudantes = new ArrayList<Pessoa>();
-	static ArrayList<Pessoa> Docentes = new ArrayList<Pessoa>();
-	static ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>();
-	static ArrayList<Pessoa> person = new ArrayList<Pessoa>();
-	static ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
-	static ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
-	static ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
+	ArrayList<Pessoa> Estudantes = new ArrayList<Pessoa>();
+	ArrayList<Pessoa> Docentes = new ArrayList<Pessoa>();
+	ArrayList<Pessoa> Funcionarios = new ArrayList<Pessoa>();
+	ArrayList<Pessoa> person = new ArrayList<Pessoa>();
+	ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
+	ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
+	ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
 	private Object DateTimeFormat;
 
 
@@ -322,7 +320,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	}
 
 	public void saveUserVote(String name, String ccNumber, String election) throws RemoteException{
-		System.out.println(name + " " + ccNumber + " " + election);
 		Pessoa aux = null;
 		for(int i = 0; i<person.size(); i++){
 			if(person.get(i).nome.equals(name) && person.get(i).CCnumber.equals(ccNumber)){
@@ -346,6 +343,16 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		}
 		
 		return false;
+	}
+
+	public void saveVotedPlaceOnPeople(String name, String ccNumber, String table) throws RemoteException{
+		Pessoa aux = null;
+		for(int i = 0; i<person.size(); i++){
+			if(person.get(i).nome.equals(name) && person.get(i).CCnumber.equals(ccNumber)){
+				aux = person.get(i);
+			}
+		}
+		aux.getTables().add(table);
 	}
 
 	public static void main(String args[]) throws IOException, InterruptedException {
@@ -397,12 +404,12 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			h.loadDataElection();
 
 			//System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-			System.out.println("======================RMI SERVER READY!======================");
+            System.out.println("___________________________< RMI SERVER READY ! >_____________________________________");
 
 			while (true) {
 				System.out.print("> ");
 				a = reader.readLine();
-				for(int i = 0; i<clientsAdmin.size(); i++){
+				for(int i = 0; i< h.clientsAdmin.size(); i++){
 					h.clientsAdmin.get(i).print_on_client(a);
 				}
 			}

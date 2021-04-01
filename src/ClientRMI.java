@@ -46,7 +46,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 
 			while (true) {
-				System.out.println("======================ADMIN CONSOLE!======================");
+				System.out.println("_____________________________< ADMIN CONSOLE >_______________________________________");
 				System.out.println("<1> REGISTAR PESSOA");
 				System.out.println("<2> CRIAR ELEICAO");
 				System.out.println("<3> GERIR CANDIDATOS A UMA ELEICAO ");
@@ -168,10 +168,13 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
 						}
 						int numEle = scan.nextInt();
+						/*
 						System.out.println("DADOS:");
 						for(int i = 0; i < h.getEleicoes().get(numEle).getListas().size(); i++){
 							System.out.println(h.getEleicoes().get(numEle).getListas().get(i).getNomeLista()+ " NUMERO DE VOTO: "+h.getEleicoes().get(numEle).getListas().get(i).getNumVotes());
 						}
+						*/
+						System.out.println(h.getEleicoes().get(numEle).toString());
 						break;
 				}
 			}

@@ -66,15 +66,16 @@ public class Eleicao implements Serializable {
     }
     @Override
     public String toString() {
-        return "Eleicao{" +
-                "nome='" + nome + '\'' +
-                ", DataInicio='" + DataInicio + '\'' +
-                ", DataFim='" + DataFim + '\'' +
-                ", publicoAlvo='" + publicoAlvo + '\'' +
-                ", estado=" + estado +
-                ", listas=" + listas +
-                ", votantes= " + peopleWhoVoted +
-                '}';
+        String pessoas = "";
+        for(Pessoa p : peopleWhoVoted ){ 
+            pessoas += p.nome + " ";
+        }
+        return  "Eleicao -> " + nome + 
+                "\nDataInicio -> " + DataInicio +
+                "\nDataFim -> " + DataFim +
+                "\nPublicoAlvo ->" + publicoAlvo + 
+                "\nEstado -> " + estado + listas +
+                "\nVotantes -> " + pessoas;
     }
 
     public void createEleicao(ArrayList<Pessoa> pessoa) throws IOException {
