@@ -99,9 +99,20 @@ public class Eleicao implements Serializable {
         in = reader.readLine();
         this.DataFim = in;
         
-        System.out.print("PUBLICO ALVO: ");
-        in = reader.readLine();
-        this.publicoAlvo = in;
+        System.out.println("PUBLICO ALVO: ");
+        System.out.println("<1> ESTUDANTES");
+        System.out.println("<2> DOCENTES");
+        System.out.println("<3> FUNCIONARIOS");
+        int opt = scan.nextInt();
+        if(opt == 1){
+            this.publicoAlvo = "ESTUDANTES";
+        }
+        else if(opt == 2){
+            this.publicoAlvo = "DOCENTES";
+        }
+        else if(opt == 3){
+            this.publicoAlvo = "FUNCIONARIOS";
+        }
 
         System.out.println("NUMERO DE LISTAS: ");
         numberOfLists = scan.nextInt();
