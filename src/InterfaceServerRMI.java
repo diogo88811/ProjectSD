@@ -23,8 +23,12 @@ public interface InterfaceServerRMI extends Remote{
 	public void notifyClient(String name, String tag) throws RemoteException;
 	public void gerirEleicao(Lista l, int eleNum,int opt,int indexLi)throws RemoteException, IOException;
 	public void alteraEleicao(Eleicao e, int numEle) throws RemoteException, IOException;
-	public void stateOfElections() throws RemoteException, ParseException;
+	public boolean stateOfElections(Eleicao eleicao, int option) throws RemoteException, ParseException;
 	public void saveUserVote(String name, String ccNumber, String election) throws RemoteException;
 	public boolean verifyUserinArray(String name, String ccNUmber, Eleicao election) throws RemoteException;
 	public void saveVotedPlaceOnPeople(String name, String ccNumber, String table) throws RemoteException;
-	}
+	public String getCrashName() throws RemoteException;
+	public String getCrashCC() throws RemoteException;
+	public void setCrashName(String name) throws RemoteException;
+	public void setCrashCC(String CC) throws RemoteException;
+}

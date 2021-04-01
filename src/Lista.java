@@ -143,7 +143,6 @@ public class Lista implements Serializable  {
                 int numCand = scan.nextInt();
                 this.candidatoPrincipal = pessoas.get(numCand);
                 break;
-
         }
     }
 }

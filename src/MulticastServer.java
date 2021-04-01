@@ -21,17 +21,19 @@ public class MulticastServer extends Thread {
     private static MulticastUser user;
     Scanner keyboardScanner = new Scanner(System.in);
     String dataReceived;
+    // Defesa para a conexão entre server e terminal
     int number = 0;
     boolean state = true;
     InterfaceServerRMI h;
 
-    
+    //Construtor
     public MulticastServer(InterfaceServerRMI h, String MULTICAST_ADDRESS) {
         super("MESA " + (long) (Math.random() * 1000));
         this.h = h;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
     }
 
+    //Funcao que recebe dados 
     public String receiveData(MulticastSocket socket) throws IOException{
         byte[] buffer = new byte[256];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -40,6 +42,8 @@ public class MulticastServer extends Thread {
         return message;
     }
 
+    // Analisa os dados que recebe e guarda-os numa hashMap
+    // Consoante o que recebe manda uma mensagem de resposta para o teminal de voto com que este server está a comunicar
     public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException, NotBoundException {
 
         String aux[] = data.split("[;]");
@@ -53,12 +57,16 @@ public class MulticastServer extends Thread {
                 user.sendData(socket, "type | request ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
             }
         }
+
         else if(info.get("type").equals("requestAnswer") && number == Integer.parseInt(info.get("NumberRequest"))){
             if(user.getName().equals(info.get("serverName"))){
                 user.sendData(socket, "type | reserve ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
+                //Incrementamos o num depois de mandar a mensagem para quando o server comunicar so com um terminal
+                // EX: Server 123 - Client 456 -> numero 1 | Server 123 - Client 456 -> numero 2
                 number++;
             }
         }
+
         else if(info.get("type").equals("reserved")){
             if(user.getName().equals(info.get("serverName"))){
                 System.out.println("GO TO TERMINAL " + info.get("IDclient") + " !");
@@ -66,6 +74,7 @@ public class MulticastServer extends Thread {
             }
 
         }
+
         else if(info.get("type").equals("authentication")){
             if(user.getName().equals(info.get("serverName"))){
                 try {
@@ -79,7 +88,7 @@ public class MulticastServer extends Thread {
                     }
                 }catch (Exception e){
 
-                    h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                    h = user.reconectRMI(h);
                     if(h.verifyUser(info.get("username"), info.get("ccNumber"), info.get("PASSWORD"))){
                         user.sendData(socket, "type | vote ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; NumberRequest | " + number + " ; terminalID | " + info.get("IDclient") + " ; userData | valid" + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + user.getName());
                     }
@@ -91,6 +100,7 @@ public class MulticastServer extends Thread {
 
             }
         }
+
         else if(info.get("type").equals("item_listRequire")){
             if(user.getName().equals(info.get("serverName"))){
                 ArrayList <Lista> listaEleicao = null ;
@@ -111,6 +121,7 @@ public class MulticastServer extends Thread {
                 user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho") + " ; serverName | " + user.getName());
             }
         }
+
         else if(info.get("type").equals("done")){
             if(user.getName().equals(info.get("serverName"))){
                 try{
@@ -120,7 +131,7 @@ public class MulticastServer extends Thread {
                     //}
                     state = true;
                 }catch (Exception e){
-                    h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                    h = user.reconectRMI(h);
                     h.saveVotes(info.get("eleicao"),info.get("voto"));
                     //for(int i = 0; i< h.getAdminClients().size(); i++){
                         h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
@@ -129,6 +140,7 @@ public class MulticastServer extends Thread {
                 }
             }
         }
+        
         else if(info.get("type").equals("voteDone")){
             if(user.getName().equals(info.get("serverName"))){
                 try{
@@ -136,7 +148,7 @@ public class MulticastServer extends Thread {
                     h.saveVotedPlaceOnPeople(info.get("username"), info.get("ccNumber"), this.getName());
                  
                 }catch(Exception e){
-                    h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                    h = user.reconectRMI(h);
                     h.saveUserVote(info.get("username"), info.get("ccNumber"), info.get("eleicao"));
                     h.saveVotedPlaceOnPeople(info.get("username"), info.get("ccNumber"), this.getName());
                 }
@@ -144,12 +156,14 @@ public class MulticastServer extends Thread {
         }
     }
 
+    //Run da Thread do Multicast Server
     public void run() {
         MulticastSocket socket = null;
         try {
             System.out.println("______________________________< " + this.getName() + " >________________________________________");
             ClientRMI client = new ClientRMI(this.getName());
             try{
+                // Guardamos esta Mesa no Array dos clientes 
                 h.saveClients(this.getName(), (InterfaceClientRMI) client);
                 h.notifyClient(this.getName(), " -> on");
             }catch (Exception e ){
@@ -173,9 +187,10 @@ public class MulticastServer extends Thread {
         InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
         server = new MulticastServer(h, args[0]);  //THREAD RECEBE
         server.start();
-        user = new MulticastUser(h, server, args[0]);  //THREAD ENVIA
+        RuntimeDemo time = new RuntimeDemo(h, server);
+        user = new MulticastUser(h, server, args[0], time);  //THREAD ENVIA
         user.start();
-        Runtime.getRuntime().addShutdownHook(new RuntimeDemo(h, server));
+        Runtime.getRuntime().addShutdownHook(time);
     }
 }
 
@@ -186,16 +201,31 @@ class MulticastUser extends Thread {
     MulticastServer server;
     boolean verify = false;
     InterfaceServerRMI h;
+    RuntimeDemo time;
 
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastUser(InterfaceServerRMI h, MulticastServer server, String MULTICAST_ADDRESS) {
+    public InterfaceServerRMI reconectRMI(InterfaceServerRMI h){
+        long sTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - sTime < 30000){
+            try{
+                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                break;
+            }catch(Exception ee){
+                System.out.println("Erro na conecao");
+            }
+        }
+        return h;
+    }
+
+    public MulticastUser(InterfaceServerRMI h, MulticastServer server, String MULTICAST_ADDRESS, RuntimeDemo time) {
         super("MESA " + (long) (Math.random() * 1000));
         this.h = h;
         this.server = server;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
+        this.time = time;
     }
 
     public void sendData(MulticastSocket socket, String data) throws IOException{
@@ -227,14 +257,40 @@ class MulticastUser extends Thread {
                 String teste = reader.readLine();
                 if(teste.equals("1")){
                     server.state = false;
-                    System.out.print("NAME: ");
-                    String aux = reader.readLine();
-                    System.out.print("CC NUMBER: ");
-                    String cc = reader.readLine();
+                    String aux, cc;
+                    try{
+                        if((h.getCrashName() == null )|| (h.getCrashCC() == null)){
+                            System.out.print("NAME: ");
+                            aux = reader.readLine();
+                            System.out.print("CC NUMBER: ");
+                            cc = reader.readLine();
+                            time.name = aux;
+                            time.ccNumber = cc;
+                        }
+                        else{
+                            aux = h.getCrashName();
+                            cc = h.getCrashCC();
+                        }
+                    }
+                    catch(Exception e){
+                        h = reconectRMI(h);
+                        if((h.getCrashName() == null )|| (h.getCrashCC() == null)){
+                            System.out.print("NAME: ");
+                            aux = reader.readLine();
+                            System.out.print("CC NUMBER: ");
+                            cc = reader.readLine();
+                            time.name = aux;
+                            time.ccNumber = cc;
+                        }
+                        else{
+                            aux = h.getCrashName();
+                            cc = h.getCrashCC();
+                        }
+                    }
                     try{
                         h.verifyLogin(aux, cc);
                     }catch (Exception e){
-                        h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                        h = reconectRMI(h);
                         h.verifyLogin(aux, cc);
                     }
                     System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
@@ -242,18 +298,18 @@ class MulticastUser extends Thread {
                     int tamanho;
                     try{
                         for(int i = 0; i< h.getEleicoes().size(); i++){
-                           if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false){
+                            // Não dá display das eleicoes que o utilizador já votou ou das eleicoes que ja acabaram
+                           if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false && h.stateOfElections(h.getEleicoes().get(i), 2)){
                                 System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
                             }
                         }
-                        
                         int numEleicoes = keyboardScanner.nextInt();
                         eleicao =  h.getEleicoes().get(numEleicoes).getNome();
                         tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
                         sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
                         
                     }catch (Exception e){
-                        h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                        h = reconectRMI(h);
                         for(int i = 0; i< h.getEleicoes().size(); i++){
                             if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false){
                                 System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
@@ -266,10 +322,9 @@ class MulticastUser extends Thread {
                     }
                 }
             }
-        } catch (IOException | NotBoundException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("ERRO FATAL NOS SERVIDORES, POR FAVOR TENTE SE CONECTAR MAIS TARDE !");
         } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         } 
         finally {
@@ -282,6 +337,7 @@ class RuntimeDemo extends Thread{
 
     InterfaceServerRMI h ;
     MulticastServer server;
+    String name, ccNumber ;
 
     public RuntimeDemo(InterfaceServerRMI h, MulticastServer server){
         this.h = h;
@@ -290,6 +346,8 @@ class RuntimeDemo extends Thread{
     public void run() {
         try {
             h.notifyClient("MESA " + server.getName(), " -> off");
+            h.setCrashName(name);
+            h.setCrashCC(ccNumber);
         } catch (RemoteException e) {
             System.out.println("ERRO!");
         }

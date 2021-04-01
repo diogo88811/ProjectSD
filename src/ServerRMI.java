@@ -26,6 +26,7 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
 	ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
 	private Object DateTimeFormat;
+	String crashName, crashCC = "";
 
 
 	public ServerRMI() throws RemoteException {
@@ -58,6 +59,22 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 	public ArrayList<InterfaceClientRMI> getAdminClients() throws RemoteException {
 		return this.clients;
+	}
+
+	public String getCrashName() throws RemoteException {
+		return this.crashName;
+	}
+
+	public String getCrashCC() throws RemoteException {
+		return this.crashCC;
+	}
+
+	public void setCrashName(String name) throws RemoteException{
+		this.crashName = name;
+	}
+
+	public void setCrashCC(String CC) throws RemoteException{
+		this.crashCC = CC;
 	}
 
 	public  void loadDataElection() throws RemoteException {
@@ -225,10 +242,10 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		System.out.println("> " + s);
 	}
 
-	public void stateOfElections() throws RemoteException, ParseException {
-		for(int i = 0; i < eleicoes.size(); i++){
-			String dataInicial = eleicoes.get(i).getDataInicio();
-			String datafinal = eleicoes.get(i).getDataFim();
+	public boolean stateOfElections(Eleicao eleicao, int option) throws RemoteException, ParseException {
+		
+			String dataInicial = eleicao.getDataInicio();
+			String datafinal = eleicao.getDataFim();
 			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date inicial = sdf.parse(dataInicial);
 			Date fina = sdf.parse(datafinal);
@@ -236,23 +253,36 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			Date now = new Date();
 			String strDate = sdf.format(now);
 			Date actual = sdf.parse(strDate);
+			
+			if(option == 0){
+				// Se ainda nao comecou
+				if(!inicial.before(actual)){
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+			else if(option == 1){
+				// Se ja acabou
+				if(fina.before(actual)){
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+			else if(option == 2){
+				// Se esta a decorrer 
+				if(inicial.before(actual) && !fina.before(actual)){
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
 
-			System.out.println("DATA INICIAL COM A ATUAL");
-			if(inicial.before(actual)){
-				System.out.println("inicial é antes");
-			}
-			else{
-				System.out.println("inicial é depois");
-			}
-
-			System.out.println("DATA final COM A ATUAL");
-			if(fina.before(actual)){
-				System.out.println("final é antes");
-			}
-			else{
-				System.out.println("final é depois");
-			}
-		}
+			return false;
 	}
 
 	public void saveVotes(String eleicao, String lista) throws RemoteException{
@@ -272,26 +302,19 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 				}
 			}
 		}
-
 		if(!flag){
 			System.out.println("Em branco ou nulo");
 		}
-
 		try {
-
-
 			OutputStream fout = new FileOutputStream("eleicao.txt");
 			ObjectOutput oout = new ObjectOutputStream(fout);
 
 			oout.writeObject(eleicoes);
 			oout.close();
-			System.out.println("MESA DE VOTO CRIADA COM SUCESSO !");
 
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-
-
 	}
 
 	public boolean verifyUser(String nome, String ccNumber, String password) throws RemoteException{
@@ -353,6 +376,17 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			}
 		}
 		aux.getTables().add(table);
+
+		try {
+			OutputStream fout = new FileOutputStream("eleicao.txt");
+			ObjectOutput oout = new ObjectOutputStream(fout);
+
+			oout.writeObject(eleicoes);
+			oout.close();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public static void main(String args[]) throws IOException, InterruptedException {

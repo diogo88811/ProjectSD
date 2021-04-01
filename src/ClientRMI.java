@@ -30,20 +30,33 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 		System.out.println("> " + s);
 	}
 
+	public static InterfaceServerRMI reconectRMI(InterfaceServerRMI h){
+        long sTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - sTime < 30000){
+            try{
+                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                break;
+            }catch(Exception ee){
+                System.out.println("Erro na conecao");
+            }
+        }
+        return h;
+    }
+
 	public static void main(String args[]) {
 		String a;
 		int menuOption;
 		Scanner scan = new Scanner(System.in);
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
+		InterfaceServerRMI h;
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
 		try {
 
-			InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+			h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
 			ClientRMI client = new ClientRMI(args[0]);
 			h.saveAdmin(args[0], (InterfaceClientRMI) client);
-
 
 			while (true) {
 				System.out.println("_____________________________< ADMIN CONSOLE >_______________________________________");
@@ -61,7 +74,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						try{
 							h.SaveRegistry(pessoa);
 						}catch(Exception e){
-							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							h = reconectRMI(h);
 							h.SaveRegistry(pessoa);
 						}
 						break;
@@ -70,12 +83,10 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						try{
 							eleicao.createEleicao(h.getEstudantes());
 							h.criarEleicao(eleicao);
-							h.stateOfElections(); // teste
 						}catch (Exception e){
-							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							h = reconectRMI(h);
 							eleicao.createEleicao(h.getEstudantes());
 							h.criarEleicao(eleicao);
-							h.stateOfElections(); //teste
 						}
 						break;
 					case 3:
@@ -84,7 +95,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							election = h.getEleicoes();
 						}
 						catch (Exception e){
-							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							h = reconectRMI(h);
 							election = h.getEleicoes();
 						}
 
@@ -110,11 +121,9 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							try{
 								h.gerirEleicao(l,eleNum,opt,numList);
 							}catch (Exception e){
-								h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+								h = reconectRMI(h);
 								h.gerirEleicao(l,eleNum,opt,numList);
 							}
-
-
 						}
 						else if(opt == 2){
 							Lista l = new Lista();
@@ -122,10 +131,9 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							try{
 								h.gerirEleicao(l,eleNum,opt,0);
 							}catch (Exception e){
-								h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+								h = reconectRMI(h);
 								h.gerirEleicao(l,eleNum,opt,0);
 							}
-
 						}
 
 						break;
@@ -135,17 +143,17 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						try{
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
-								//if para verificar se a eleição já acabou
-								//adicionando flag de acabou na classe eleicao
-								//fazer depois com o tempo
+								//se a eleição já acabou
+								if(h.stateOfElections(h.getEleicoes().get(i), 0)){
 								System.out.println(i + " " + h.getEleicoes().get(i).getNome());
+								}
 							}
 							int numEle = scan.nextInt();
 							Eleicao el = h.getEleicoes().get(numEle);
 							el.changeEle();
 							h.alteraEleicao(el,numEle);
 						}catch (Exception e){
-							h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+							h = reconectRMI(h);
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
 								//if para verificar se a eleição já acabou
@@ -158,14 +166,16 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							el.changeEle();
 							h.alteraEleicao(el,numEle);
 						}
-
 						break;
 
 					case 5:
-						//eleicoes que já tenham terminado
-						System.out.println("SELECIONE UMA ELEICAO");
+						try{
+							System.out.println("SELECIONE UMA ELEICAO");
 						for(int i = 0; i < h.getEleicoes().size(); i++){
-							System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+							//eleicoes que já tenham terminado
+							if(h.stateOfElections(h.getEleicoes().get(i), 1)){
+								System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+							}
 						}
 						int numEle = scan.nextInt();
 						/*
@@ -175,10 +185,25 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						}
 						*/
 						System.out.println(h.getEleicoes().get(numEle).toString());
+
+						}catch(Exception e){
+							h = reconectRMI(h);
+							System.out.println("SELECIONE UMA ELEICAO");
+							for(int i = 0; i < h.getEleicoes().size(); i++){
+								System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+							}
+							int numEle = scan.nextInt();
+							/*
+							System.out.println("DADOS:");
+							for(int i = 0; i < h.getEleicoes().get(numEle).getListas().size(); i++){
+								System.out.println(h.getEleicoes().get(numEle).getListas().get(i).getNomeLista()+ " NUMERO DE VOTO: "+h.getEleicoes().get(numEle).getListas().get(i).getNumVotes());
+							}
+							*/
+							System.out.println(h.getEleicoes().get(numEle).toString());
+						}
 						break;
 				}
 			}
-
 		} catch (Exception e) {
 			System.out.println("Exception in main: " + e);
 			e.printStackTrace();

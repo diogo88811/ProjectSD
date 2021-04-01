@@ -91,11 +91,11 @@ public class Eleicao implements Serializable {
         in = reader.readLine();
         this.nome = in;
 
-        System.out.print("DATA INICIO (dd/mm/aaaa): ");
+        System.out.print("DATA INICIO (aaaa-mm-dd hh:mm:ss): ");
         in = reader.readLine();
         this.DataInicio = in;
 
-        System.out.print("DATA FIM (dd/mm/aaaa): ");
+        System.out.print("DATA FIM (aaaa-mm-dd hh:mm:ss): ");
         in = reader.readLine();
         this.DataFim = in;
         
@@ -155,7 +155,7 @@ public class Eleicao implements Serializable {
                 this.nome = in;
                 break;
             case 2:
-                System.out.println("INISRA A DATA: ");
+                System.out.println("INSIRA A DATA: ");
                 in = reader.readLine();
                 this.DataInicio  = in;
                 break;
