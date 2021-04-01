@@ -136,7 +136,6 @@ public class MulticastClient extends Thread {
                 state = true;
             }
         }
-
     }
 
     public void run() {
