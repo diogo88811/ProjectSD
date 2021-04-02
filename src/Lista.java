@@ -141,6 +141,24 @@ public class Lista implements Serializable  {
                 int numCand = scan.nextInt();
                 this.candidatoPrincipal = pessoas.get(numCand);
                 break;
+            case 3:
+                System.out.println("SELECIONE QUEM QUER REMOVER:");
+                for(int i = 0; i < this.getPessoas().size(); i++){
+                    System.out.println(i + " "+ this.getPessoas().get(i).getNome());
+                }
+                int canIndex = scan.nextInt();
+                this.getPessoas().remove(canIndex);
+                break;
+            case 4:
+                System.out.println("LISTA DE PESSOAS QUE PODE ADICIONAR: ");
+                for(int i = 0; i < pessoas.size(); i ++){
+                    if(!this.getPessoas().contains(pessoas.get(i))){
+                        System.out.println(i + " "+ pessoas.get(i).getNome());
+                    }
+                }
+                int canIndex1 = scan.nextInt();
+                this.getPessoas().add(pessoas.get(canIndex1));
+                break;
         }
     }
 }

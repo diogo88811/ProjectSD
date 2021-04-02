@@ -138,8 +138,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 						break;
 					case 4:
-						//só mostrar eleicaoes que aindam não comecaram
-						//so as que não começaram podem ser alteradas
+
 						try{
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
@@ -178,12 +177,6 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							}
 						}
 						int numEle = scan.nextInt();
-						/*
-						System.out.println("DADOS:");
-						for(int i = 0; i < h.getEleicoes().get(numEle).getListas().size(); i++){
-							System.out.println(h.getEleicoes().get(numEle).getListas().get(i).getNomeLista()+ " NUMERO DE VOTO: "+h.getEleicoes().get(numEle).getListas().get(i).getNumVotes());
-						}
-						*/
 						System.out.println(h.getEleicoes().get(numEle).toString());
 
 						}catch(Exception e){
@@ -193,12 +186,6 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 								System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
 							}
 							int numEle = scan.nextInt();
-							/*
-							System.out.println("DADOS:");
-							for(int i = 0; i < h.getEleicoes().get(numEle).getListas().size(); i++){
-								System.out.println(h.getEleicoes().get(numEle).getListas().get(i).getNomeLista()+ " NUMERO DE VOTO: "+h.getEleicoes().get(numEle).getListas().get(i).getNumVotes());
-							}
-							*/
 							System.out.println(h.getEleicoes().get(numEle).toString());
 						}
 						break;

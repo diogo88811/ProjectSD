@@ -76,7 +76,7 @@ public class Eleicao implements Serializable {
                 "\nDataFim -> " + DataFim +
                 "\nPublicoAlvo ->" + publicoAlvo + 
                 "\nEstado -> " + estado + listas +
-                "\nVotantes -> " + pessoas;
+                "\nVota3ntes -> " + pessoas;
     }
 
     public void createEleicao(ArrayList<Pessoa> pessoa) throws IOException {
