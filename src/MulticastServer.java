@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -115,9 +116,12 @@ public class MulticastServer extends Thread {
                         listaEleicao = eleicao.getListas();
                     }
                 }
+
                 for(int i = 0; i< Integer.parseInt(info.get("tamanhoLista")); i++){
                     lista += "item_" + i + "_name | " + listaEleicao.get(i).getNomeLista() + " ; ";
                 }
+
+                lista += "item_" + Integer.parseInt(info.get("tamanhoLista"))  + "_name | " + "BRANCO" + " ; ";
                 user.sendData(socket, lista + "username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") + " ; terminalID | " + info.get("IDclient") + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanho") + " ; serverName | " + user.getName());
             }
         }
@@ -135,6 +139,24 @@ public class MulticastServer extends Thread {
                     h.saveVotes(info.get("eleicao"),info.get("voto"));
                     //for(int i = 0; i< h.getAdminClients().size(); i++){
                         h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //}
+                    state = true;
+                }
+            }
+        }
+        else if(info.get("type").equals("null")){
+            if(user.getName().equals(info.get("serverName"))){
+                try{
+                    h.saveVotes(info.get("eleicao"),info.get("voto"));
+                    //for(int i = 0; i< h.getAdminClients().size(); i++){
+                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
+                    //}
+                    state = true;
+                }catch (Exception e){
+                    h = user.reconectRMI(h);
+                    h.saveVotes(info.get("eleicao"),info.get("voto"));
+                    //for(int i = 0; i< h.getAdminClients().size(); i++){
+                    h.print_on_server(info.get("username") + " VOTO " + info.get("voto"));
                     //}
                     state = true;
                 }
@@ -296,33 +318,47 @@ class MulticastUser extends Thread {
                     System.out.println("SELECIONA A ELEICAO EM QUE QUER VOTAR:");
                     String eleicao;
                     int tamanho;
+                    int flg = 0;
                     try{
                         for(int i = 0; i< h.getEleicoes().size(); i++){
                             // Não dá display das eleicoes que o utilizador já votou ou das eleicoes que ja acabaram
                            if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false && h.stateOfElections(h.getEleicoes().get(i), 2)){
                                 System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                                flg = 1;
                             }
                         }
-                        int numEleicoes = keyboardScanner.nextInt();
-                        eleicao =  h.getEleicoes().get(numEleicoes).getNome();
-                        tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
-                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                        if(flg == 1){
+                            int numEleicoes = keyboardScanner.nextInt();
+                            eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                            tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                            sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                        }
+                        else{
+                            System.out.println("NAO HA ELEICOES DISPONIVEIS");
+                        }
                         
                     }catch (Exception e){
                         h = reconectRMI(h);
                         for(int i = 0; i< h.getEleicoes().size(); i++){
-                            if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false){
+                            // Não dá display das eleicoes que o utilizador já votou ou das eleicoes que ja acabaram
+                            if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false && h.stateOfElections(h.getEleicoes().get(i), 2)){
                                 System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
+                                flg = 1;
                             }
                         }
-                        int numEleicoes = keyboardScanner.nextInt();
-                        eleicao =  h.getEleicoes().get(numEleicoes).getNome();
-                        tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
-                        sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                        if(flg == 1){
+                            int numEleicoes = keyboardScanner.nextInt();
+                            eleicao =  h.getEleicoes().get(numEleicoes).getNome();
+                            tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                            sendToServer(socket, "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | " + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | " + getName());
+                        }
+                        else{
+                            System.out.println("NAO HA ELEICOES DISPONIVEIS");
+                        }
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             System.out.println("ERRO FATAL NOS SERVIDORES, POR FAVOR TENTE SE CONECTAR MAIS TARDE !");
         } catch (InterruptedException e1) {
             e1.printStackTrace();

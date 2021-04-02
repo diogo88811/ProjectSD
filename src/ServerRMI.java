@@ -290,21 +290,40 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		//lista em que votou
 		boolean flag = false;
 		System.out.println("tamanho das eleicoes " + eleicoes.size());
-		for(int i = 0; i < eleicoes.size() ; i++){
-			if(eleicoes.get(i).getNome().equals(eleicao)){
-				ArrayList<Lista> l = eleicoes.get(i).listas;
-				System.out.println("Tamanho das lista "+l.size());
-				for(int j = 0; j < l.size(); j++){
-					if(l.get(j).getNomeLista().equals(lista)){
-						l.get(j).setNumVotes((l.get(j).getNumVotes() + 1));
-						flag = true;
-					}
+		if(lista.equals("BRANCO")){
+			for(int i = 0; i < eleicoes.size() ; i++){
+				if(eleicoes.get(i).getNome().equals(eleicao)) {
+					eleicoes.get(i).votosBranco +=1;
 				}
 			}
 		}
-		if(!flag){
-			System.out.println("Em branco ou nulo");
+		else if(lista.equals("NULL")){
+			for(int i = 0; i < eleicoes.size() ; i++){
+				if(eleicoes.get(i).getNome().equals(eleicao)) {
+					eleicoes.get(i).votoNulo +=1;
+					System.out.println("VOTOU NULO");
+				}
+			}
 		}
+
+		else{
+			for(int i = 0; i < eleicoes.size() ; i++){
+				if(eleicoes.get(i).getNome().equals(eleicao)){
+					ArrayList<Lista> l = eleicoes.get(i).listas;
+					System.out.println("Tamanho das lista "+l.size());
+					for(int j = 0; j < l.size(); j++){
+						if(l.get(j).getNomeLista().equals(lista)){
+							l.get(j).setNumVotes((l.get(j).getNumVotes() + 1));
+							flag = true;
+						}
+					}
+				}
+			}
+			if(!flag){
+				System.out.println("Em branco ou nulo");
+			}
+		}
+
 		try {
 			OutputStream fout = new FileOutputStream("eleicao.txt");
 			ObjectOutput oout = new ObjectOutputStream(fout);

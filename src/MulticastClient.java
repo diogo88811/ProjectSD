@@ -107,9 +107,13 @@ public class MulticastClient extends Thread {
         else if(info.get("type").equals("item_list")){
             if(this.getName().equals(info.get("terminalID"))){
                 System.out.println("LISTA DE CANDIDATOS");
+                int k = 0;
                 for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
                     System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
+                    k = i;
                 }
+                k += 1;
+                System.out.println(k +  " VOTO EM BRANCO :");
 
                 String auxVoto = null;
                 Scanner scan = new Scanner(System.in);
@@ -118,10 +122,18 @@ public class MulticastClient extends Thread {
                 while (System.currentTimeMillis() - sTime < 60000){
                     if (System.in.available() > 0){
                         auxVoto = scan.nextLine();
-                        sendData(socket, "type | done ; IDclient | " + info.get("username")  + " ; voto | " + info.get("item_" + Integer.parseInt(auxVoto) + "_name") + " ; serverName | " + info.get("serverName"), false);
-                        sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
-                        state = true;
-                        System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+                        if(Integer.parseInt(auxVoto) > Integer.parseInt(info.get("item_count"))){
+                            sendData(socket, "type | done ; IDclient | " + info.get("username")  + " ; voto | " + info.get("item_" + Integer.parseInt(auxVoto) + "_name") + " ; serverName | " + info.get("serverName"), false);
+                            sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
+                            state = true;
+                            System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+                        }
+                        else{
+                            sendData(socket ,"type | null ; username | " + info.get("username")  + " ; voto | NULL ; serverName | " + info.get("serverName"), false);
+                            sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
+                            state = true;
+                        }
+
                         break;
                     }
                 }

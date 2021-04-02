@@ -12,7 +12,8 @@ public class Eleicao implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     public String nome, DataInicio, DataFim, publicoAlvo;
-    int estado;
+    int estado, votosBranco, votoNulo;
+
     public ArrayList<Lista> listas = new ArrayList<Lista>();
     public ArrayList<Pessoa> peopleWhoVoted = new ArrayList<Pessoa>();
     
@@ -146,6 +147,8 @@ public class Eleicao implements Serializable {
         }
         //funcao para verificar se a a eleicao já começou
         this.estado = 0;
+        this.votoNulo = 0;
+        this.votosBranco = 0;
     }
 
     public void changeEle() throws IOException {
