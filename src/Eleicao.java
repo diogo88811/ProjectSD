@@ -101,18 +101,18 @@ public class Eleicao implements Serializable {
         this.DataFim = in;
         
         System.out.println("PUBLICO ALVO: ");
-        System.out.println("<1> ESTUDANTES");
+        System.out.println("<1> ESTUDANTE");
         System.out.println("<2> DOCENTES");
         System.out.println("<3> FUNCIONARIOS");
         int opt = scan.nextInt();
         if(opt == 1){
-            this.publicoAlvo = "ESTUDANTES";
+            this.publicoAlvo = "ESTUDANTE";
         }
         else if(opt == 2){
-            this.publicoAlvo = "DOCENTES";
+            this.publicoAlvo = "DOCENTE";
         }
         else if(opt == 3){
-            this.publicoAlvo = "FUNCIONARIOS";
+            this.publicoAlvo = "FUNCIONARIO";
         }
 
         System.out.println("NUMERO DE LISTAS: ");

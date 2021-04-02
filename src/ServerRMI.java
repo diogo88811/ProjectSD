@@ -25,7 +25,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 	ArrayList<Eleicao> eleicoes = new ArrayList<Eleicao>();
 	ArrayList<InterfaceClientRMI> clientsAdmin = new ArrayList<InterfaceClientRMI>();
 	ArrayList<InterfaceClientRMI> clients = new ArrayList<InterfaceClientRMI>();
-	private Object DateTimeFormat;
 	String crashName, crashCC = "";
 
 
@@ -408,6 +407,15 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		}
 	}
 
+	public String getUserproperties(String name, String ccNumber) throws RemoteException{
+		for(int i = 0; i < person.size(); i++){
+			if(person.get(i).nome.equals(name) && person.get(i).CCnumber.equals(ccNumber) ){
+				return person.get(i).trabalho;
+			}
+		}
+		return "";
+	}
+
 	public static void main(String args[]) throws IOException, InterruptedException {
 		String a;
 		DatagramSocket aSocket = null;
@@ -450,13 +458,20 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		t.start();
 
 		try {
+
+			System.getProperties().put("java.security.policy","policy.all");
+        	System.setSecurityManager(new SecurityManager());
+
 			ServerRMI h = new ServerRMI();
+
+			System.getProperties().put("java.security.policy","policy.all");
+        	System.setSecurityManager(new SecurityManager());
+
 			Registry r = LocateRegistry.createRegistry(7000);
 			r.rebind("RMI Server", h);
 
 			h.loadDataElection();
 
-			//System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
             System.out.println("___________________________< RMI SERVER READY ! >_____________________________________");
 
 			while (true) {

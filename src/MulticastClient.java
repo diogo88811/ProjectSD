@@ -113,7 +113,7 @@ public class MulticastClient extends Thread {
                     k = i;
                 }
                 k += 1;
-                System.out.println(k +  " VOTO EM BRANCO :");
+                System.out.println("<" + k + "> " +  "VOTO BRANCO ");
 
                 String auxVoto = null;
                 Scanner scan = new Scanner(System.in);
@@ -132,6 +132,7 @@ public class MulticastClient extends Thread {
                             sendData(socket ,"type | null ; username | " + info.get("username")  + " ; voto | NULL ; serverName | " + info.get("serverName"), false);
                             sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
                             state = true;
+                            System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
                         }
 
                         break;

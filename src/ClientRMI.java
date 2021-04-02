@@ -2,8 +2,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -34,7 +34,8 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
         long sTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - sTime < 30000){
             try{
-                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+			h = (InterfaceServerRMI) reg.lookup("RMI Server");
                 break;
             }catch(Exception ee){
                 System.out.println("Erro na conecao");
@@ -54,7 +55,8 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 		try {
 
-			h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+			Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+			h = (InterfaceServerRMI) reg.lookup("RMI Server");
 			ClientRMI client = new ClientRMI(args[0]);
 			h.saveAdmin(args[0], (InterfaceClientRMI) client);
 

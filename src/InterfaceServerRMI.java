@@ -31,4 +31,5 @@ public interface InterfaceServerRMI extends Remote{
 	public String getCrashCC() throws RemoteException;
 	public void setCrashName(String name) throws RemoteException;
 	public void setCrashCC(String CC) throws RemoteException;
+	public String getUserproperties(String name, String ccNumber) throws RemoteException;
 }

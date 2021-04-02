@@ -2,6 +2,7 @@ import java.net.MulticastSocket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.BufferedReader;
@@ -189,7 +190,8 @@ public class MulticastServer extends Thread {
                 h.saveClients(this.getName(), (InterfaceClientRMI) client);
                 h.notifyClient(this.getName(), " -> on");
             }catch (Exception e ){
-                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+			h = (InterfaceServerRMI) reg.lookup("RMI Server");
                 h.saveClients(this.getName(), (InterfaceClientRMI) client);
                 h.notifyClient(this.getName(), " -> on");
             }
@@ -206,7 +208,8 @@ public class MulticastServer extends Thread {
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
-        InterfaceServerRMI h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+        Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);             
+        InterfaceServerRMI h = (InterfaceServerRMI) reg.lookup("RMI Server");
         server = new MulticastServer(h, args[0]);  //THREAD RECEBE
         server.start();
         RuntimeDemo time = new RuntimeDemo(h, server);
@@ -233,7 +236,8 @@ class MulticastUser extends Thread {
         long sTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - sTime < 30000){
             try{
-                h = (InterfaceServerRMI) LocateRegistry.getRegistry(7000).lookup("RMI Server");
+                Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+			h = (InterfaceServerRMI) reg.lookup("RMI Server");
                 break;
             }catch(Exception ee){
                 System.out.println("Erro na conecao");
@@ -269,6 +273,7 @@ class MulticastUser extends Thread {
     public void run() {
         MulticastSocket socket = null;
         try {
+            String job;
             sleep(1000);
             System.out.print("\nIDENTIFICA O DEPARTAMENTO DESTA MESA DE VOTO: ");
             String dep = reader.readLine();
@@ -293,6 +298,7 @@ class MulticastUser extends Thread {
                             aux = h.getCrashName();
                             cc = h.getCrashCC();
                         }
+                        job = h.getUserproperties(aux, cc);
                     }
                     catch(Exception e){
                         h = reconectRMI(h);
@@ -308,6 +314,7 @@ class MulticastUser extends Thread {
                             aux = h.getCrashName();
                             cc = h.getCrashCC();
                         }
+                        job = h.getUserproperties(aux, cc);
                     }
                     try{
                         h.verifyLogin(aux, cc);
@@ -323,8 +330,10 @@ class MulticastUser extends Thread {
                         for(int i = 0; i< h.getEleicoes().size(); i++){
                             // Não dá display das eleicoes que o utilizador já votou ou das eleicoes que ja acabaram
                            if(h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false && h.stateOfElections(h.getEleicoes().get(i), 2)){
+                            if(h.getEleicoes().get(i).publicoAlvo.toUpperCase().equals(job.toUpperCase())){
                                 System.out.println("\t<" + i + "> " + h.getEleicoes().get(i).getNome());
                                 flg = 1;
+                               }  
                             }
                         }
                         if(flg == 1){
