@@ -1,140 +1,271 @@
 import java.net.MulticastSocket;
+
 import java.util.HashMap;
+
 import java.util.Scanner;
+
 import java.net.DatagramPacket;
+
 import java.net.InetAddress;
+
 import java.io.BufferedReader;
+
 import java.io.IOException;
+
 import java.io.InputStreamReader;
+
+
 
 public class MulticastClient extends Thread {
 
+
+
     // "224.0.224.0"
+
     private String MULTICAST_ADDRESS;
+
     private static MulticastClient client;
+
     boolean state = true;
+
     private int PORT = 7000;
+
     HashMap<String, String> info = new HashMap<String, String>();
+
     InputStreamReader input = new InputStreamReader(System.in);
+
     BufferedReader reader = new BufferedReader(input);
+
     Scanner keyboardScanner = new Scanner(System.in);
 
 
+
+
+
     public MulticastClient(String MULTICAST_ADDRESS) {
+
         super("TERMINAL " + (long) (Math.random() * 1000));
+
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
+
     }
+
+
 
     public String sendData(MulticastSocket socket, String msg, boolean premission) throws IOException{
+
         Scanner keyboardScanner = new Scanner(System.in);
 
+
+
         if(premission == true){
+
             String a = keyboardScanner.nextLine();
+
             String aux = msg + a;
+
             byte[] buffer = aux.getBytes();
+
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+
             socket.send(packet);
 
+
+
             return aux;
+
         }
+
         else{
+
             String aux = msg ;
+
             byte[] buffer = aux.getBytes();
+
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+
             socket.send(packet);
 
+
+
             return aux;
+
         }
+
     }
+
+
 
     public String receiveData(MulticastSocket socket) throws IOException{
+
         byte[] buffer = new byte[256];
+
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
         socket.receive(packet);
+
         String message = new String(packet.getData(), 0, packet.getLength());
 
+
+
         return message;
+
     }
+
+
 
     public void analyzeData(MulticastSocket socket, String data) throws IOException, InterruptedException{
 
+
+
         String aux[] = data.split("[;]");
 
+
+
         for(String a : aux){
+
             String types[] = a.split("\\|");
+
             info.put(types[0].trim(), types[1].trim());
+
         }
+
+
 
         if(info.get("type").equals("request") && state == true){
+
             sendData(socket, "type | requestAnswer ; NumberRequest | " + info.get("NumberRequest") + " ; IDclient | " + this.getName() + " ; msg | FREE ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+
         }
 
+
+
         else if(info.get("type").equals("reserve")){
+
             if(this.getName().equals(info.get("terminalID"))){
+
                 sendData(socket, "type | reserved ; IDclient | " + this.getName() + " ; eleicao | " + info.get("eleicao") + " ; IDclient | " + this.getName() + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+
                 state = false;
+
                 System.out.print("NOME : " + info.get("username"));
+
                 System.out.print("\nNUMERO CC : " + info.get("ccNumber"));
+
                 System.out.print("\nPASSWORD: ");
+
                 String password = null;
+
+
 
                 Scanner sc = new Scanner(System.in);
 
+
+
                 long sTime = System.currentTimeMillis();
+
                 while (System.currentTimeMillis() - sTime < 60000){
+
                     if (System.in.available() > 0){
+
                         password = sc.nextLine();
+
                         sendData(socket, "type | authentication ; username | " + info.get("username") + " ; IDclient | " + this.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+
                         break;
+
                     }
+
                 }
+
                 if(password == null){
+
                     System.out.println("\nERRO NA AUTENTICACAO DO UTILIZADOR");
+
                     state = true;
+
                 }
+
             }
+
         }
+
+
 
         else if(info.get("type").equals("vote") && info.get("userData").equals("valid")){
+
             if(this.getName().equals(info.get("terminalID"))){
+
                 System.out.println("\nBEM VINDO, " + info.get("username") + " !\n");
+
                 sendData(socket, "type | item_listRequire ; username | " + info.get("username") + " ; ccNumber | " + info.get("ccNumber") +  " ; IDclient | " + this.getName() + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"), false);
+
             }
+
         }
 
+
+
         else if(info.get("type").equals("item_list")){
+
             if(this.getName().equals(info.get("terminalID"))){
+
                 System.out.println("LISTA DE CANDIDATOS");
+
                 int k = 0;
+
                 for(int i = 0 ; i< Integer.parseInt(info.get("item_count")) ; i++){
+
                     System.out.println("<" + i + "> " + info.get("item_" + i + "_name"));
+
                     k = i;
+
                 }
+
                 k += 1;
+
                 System.out.println("<" + k + "> " +  "VOTO BRANCO ");
 
+
+
                 String auxVoto = null;
+
                 Scanner scan = new Scanner(System.in);
 
+
+
                 long sTime = System.currentTimeMillis();
+
                 while (System.currentTimeMillis() - sTime < 60000){
+
                     if (System.in.available() > 0){
+
                         auxVoto = scan.nextLine();
-                        if(Integer.parseInt(auxVoto) > Integer.parseInt(info.get("item_count"))){
+
+                        if(Integer.parseInt(auxVoto) < Integer.parseInt(info.get("item_count"))){
+
+                            System.out.println("nao e nulo");
+
                             sendData(socket, "type | done ; IDclient | " + info.get("username")  + " ; voto | " + info.get("item_" + Integer.parseInt(auxVoto) + "_name") + " ; serverName | " + info.get("serverName"), false);
+
                             sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
+
                             state = true;
+
                             System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
+
                         }
+
                         else{
                             sendData(socket ,"type | null ; username | " + info.get("username")  + " ; voto | NULL ; serverName | " + info.get("serverName"), false);
                             sendData(socket, "type | voteDone ; username | " + info.get("username") + " ; eleicao | " + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber") + " ; serverName | " + info.get("serverName"), false);
                             state = true;
                             System.out.println("O SEU VOTO FOI REGISTADO COM SUCESSO !");
                         }
-
                         break;
                     }
                 }
@@ -144,6 +275,7 @@ public class MulticastClient extends Thread {
                 }
             }
         }
+
         else if(info.get("type").equals("restart")){
             if(this.getName().equals(info.get("terminalID"))){
                 state = true;
@@ -151,23 +283,33 @@ public class MulticastClient extends Thread {
         }
     }
 
+
+
     public void run() {
+
         MulticastSocket socket = null;
+
         try {
             System.out.println("______________________________< " + this.getName() + " >________________________________________");
             socket = new MulticastSocket(PORT);  
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
             String data;
+
             while (true) {
                 data = receiveData(socket);
                 analyzeData(socket, data);
             }
+
         }catch (IOException e) { e.printStackTrace();} catch (InterruptedException e) { e.printStackTrace();}
     }
+
+
 
     public static void main(String[] args) throws IOException {
         client = new MulticastClient(args[0]);
         client.start();
     }
+
 }
+

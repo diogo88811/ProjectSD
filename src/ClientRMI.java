@@ -34,7 +34,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
         long sTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - sTime < 30000){
             try{
-                Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+                Registry reg = LocateRegistry.getRegistry("193.168.100.5", 7000);            
 			h = (InterfaceServerRMI) reg.lookup("RMI Server");
                 break;
             }catch(Exception ee){
@@ -55,7 +55,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 		try {
 
-			Registry reg = LocateRegistry.getRegistry("192.168.1.70", 7000);            
+			Registry reg = LocateRegistry.getRegistry("193.168.100.5", 7000);            
 			h = (InterfaceServerRMI) reg.lookup("RMI Server");
 			ClientRMI client = new ClientRMI(args[0]);
 			h.saveAdmin(args[0], (InterfaceClientRMI) client);
