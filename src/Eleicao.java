@@ -102,8 +102,8 @@ public class Eleicao implements Serializable {
         
         System.out.println("PUBLICO ALVO: ");
         System.out.println("<1> ESTUDANTE");
-        System.out.println("<2> DOCENTES");
-        System.out.println("<3> FUNCIONARIOS");
+        System.out.println("<2> DOCENTE");
+        System.out.println("<3> FUNCIONARIO");
         int opt = scan.nextInt();
         if(opt == 1){
             this.publicoAlvo = "ESTUDANTE";
@@ -126,14 +126,15 @@ public class Eleicao implements Serializable {
             l.setNomeLista(in);
             System.out.println("CANDIDATO PRINCIPAL: ");
             for(int k = 0; k < pessoa.size(); k++){
-                System.out.println(k+" "+pessoa.get(k).getNome());
+                System.out.println("<" + k +"> "+pessoa.get(k).getNome());
             }
             numCandidate = scan.nextInt();
             l.setCandidatoPrincipal(pessoa.get(numCandidate));
             while(true) {
+                System.out.println("<0> SAIR");
                 for (int k = 0; k < pessoa.size(); k++) {
                     if(!(l.getPessoas().contains(pessoa.get(k))))
-                        System.out.println((k+1) + " " + pessoa.get(k).getNome());
+                        System.out.println("<" + (k+1) + "> " + pessoa.get(k).getNome());
                 }
                 numCandidate = scan.nextInt();
                 if(numCandidate != 0) {

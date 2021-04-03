@@ -116,7 +116,6 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							for(int i = 0; i < election.get(eleNum).getListas().size(); i++){
 								System.out.println(i + " "+ election.get(eleNum).getListas().get(i).getNomeLista());
 							}
-
 							int numList = scan.nextInt();
 							Lista l = election.get(eleNum).getListas().get(numList);
 							l.modifyList(h.getEstudantes());
@@ -157,9 +156,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							h = reconectRMI(h);
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
-								//if para verificar se a eleição já acabou
-								//adicionando flag de acabou na classe eleicao
-								//fazer depois com o tempo
+								//if para verificar se a eleição já acabou adicionando flag de acabou na classe eleicao fazer depois com o tempo
 								System.out.println(i + " " + h.getEleicoes().get(i).getNome());
 							}
 							int numEle = scan.nextInt();

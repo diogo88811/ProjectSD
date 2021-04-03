@@ -32,4 +32,8 @@ public interface InterfaceServerRMI extends Remote{
 	public void setCrashName(String name) throws RemoteException;
 	public void setCrashCC(String CC) throws RemoteException;
 	public String getUserproperties(String name, String ccNumber) throws RemoteException;
+	public void writeToFile(String ficheiro) throws RemoteException;
+	public ArrayList<String> getLocal() throws RemoteException;
+	public void addLocal(String data) throws RemoteException;
+	public void remeveLocal(int a) throws RemoteException;
 }
