@@ -180,13 +180,13 @@ public class MulticastServer extends Thread {
             if (user.getName().equals(info.get("serverName"))) {
                 try {
                     h.saveVotes(info.get("eleicao"), info.get("voto"));
-                    h.notifyClient(info.get("username") + " VOTO ", info.get("voto"));
+                    h.notifyClient(info.get("username"), " VOTOU NA MESA " + args );
                     state = true;
 
                 } catch (Exception e) {
                     h = user.reconectRMI(h);
                     h.saveVotes(info.get("eleicao"), info.get("voto"));
-                    h.notifyClient(info.get("username") + " VOTO ", info.get("voto"));
+                    h.notifyClient(info.get("username"), " VOTOU NA MESA " + args );
                     state = true;
                 }
             }

@@ -354,8 +354,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 		// eleicao
 		// lista em que votou
 
-		System.out.println("tamanho das eleicoes " + eleicoes.size());
-
 		if (lista.equals("BRANCO")) {
 			for (int i = 0; i < eleicoes.size(); i++) {
 				if (eleicoes.get(i).getNome().equals(eleicao)) {
@@ -368,7 +366,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			for (int i = 0; i < eleicoes.size(); i++) {
 				if (eleicoes.get(i).getNome().equals(eleicao)) {
 					eleicoes.get(i).votoNulo += 1;
-					System.out.println("VOTOU NULO");
 				}
 			}
 		}
@@ -377,7 +374,6 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 			for (int i = 0; i < eleicoes.size(); i++) {
 				if (eleicoes.get(i).getNome().equals(eleicao)) {
 					ArrayList<Lista> l = eleicoes.get(i).listas;
-					System.out.println("Tamanho das lista " + l.size());
 					for (int j = 0; j < l.size(); j++) {
 						if (l.get(j).getNomeLista().equals(lista)) {
 							l.get(j).setNumVotes((l.get(j).getNumVotes() + 1));
