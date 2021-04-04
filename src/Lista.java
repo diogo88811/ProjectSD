@@ -114,7 +114,7 @@ public class Lista implements Serializable  {
             }
         }
     }
-    public void modifyList(ArrayList<Pessoa> pessoas) throws IOException {
+    public void modifyList(ArrayList<Pessoa> pessoas, String tipo) throws IOException {
         Scanner scan = new Scanner(System.in);
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
@@ -124,6 +124,8 @@ public class Lista implements Serializable  {
         System.out.println("<4> ADICIONAR PESSOAS: ");
         int numOpt = scan.nextInt();
         String in = null;
+        ArrayList<Pessoa> aux = new ArrayList<Pessoa>();
+
         switch (numOpt){
             case 1:
                 System.out.println("INTRODUZA O NOME: ");
@@ -133,13 +135,19 @@ public class Lista implements Serializable  {
             case 2:
                 System.out.println("CANDIDATO PRINCIPAL: " + this.getCandidatoPrincipal().getNome());
                 System.out.println("SELECIONE OUTRO: ");
-                for(int i = 0; i < pessoas.size(); i++){
-                    if(pessoas.get(i) != this.getCandidatoPrincipal()){
-                        System.out.println(i + " "+ pessoas.get(i).getNome());
+                for(int i = 0; i< pessoas.size(); i++){
+                    if(tipo.toUpperCase().equals(pessoas.get(i).getTrabalho()) && pessoas.get(i) != this.getCandidatoPrincipal()){
+                        aux.add(pessoas.get(i));
                     }
                 }
+
+                for(int i = 0; i < aux.size(); i ++){
+                    System.out.println("<" + i + "> "+ aux.get(i).getNome());
+                }
+
+                
                 int numCand = scan.nextInt();
-                this.candidatoPrincipal = pessoas.get(numCand);
+                this.candidatoPrincipal = aux.get(numCand);
                 break;
             case 3:
                 System.out.println("SELECIONE QUEM QUER REMOVER:");
@@ -151,13 +159,18 @@ public class Lista implements Serializable  {
                 break;
             case 4:
                 System.out.println("LISTA DE PESSOAS QUE PODE ADICIONAR: ");
-                for(int i = 0; i < pessoas.size(); i ++){
-                    if(!this.getPessoas().contains(pessoas.get(i))){
-                        System.out.println(i + " "+ pessoas.get(i).getNome());
+
+                for(int i = 0; i< pessoas.size(); i++){
+                    if(tipo.toUpperCase().equals(pessoas.get(i).getTrabalho()) && !this.getPessoas().contains(aux.get(i))){
+                        aux.add(pessoas.get(i));
                     }
                 }
+
+                for(int i = 0; i < aux.size(); i ++){
+                    System.out.println("< " + i + "> "+ aux.get(i).getNome());
+                }
                 int canIndex1 = scan.nextInt();
-                this.getPessoas().add(pessoas.get(canIndex1));
+                this.getPessoas().add(aux.get(canIndex1));
                 break;
         }
     }

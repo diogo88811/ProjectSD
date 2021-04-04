@@ -93,11 +93,7 @@ public class MulticastClient extends Thread {
                 while (System.currentTimeMillis() - sTime < 60000) {
                     if (System.in.available() > 0) {
                         password = sc.nextLine();
-                        sendData(socket,
-                                "type | authentication ; username | " + info.get("username") + " ; IDclient | "
-                                        + this.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | "
-                                        + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | "
-                                        + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"));
+                        sendData(socket,"type | authentication ; username | " + info.get("username") + " ; IDclient | " + this.getName() + " ; ccNumber | " + info.get("ccNumber") + " ; PASSWORD | " + password + " ; eleicao | " + info.get("eleicao") + " ; tamanhoLista | " + info.get("tamanhoLista") + " ; serverName | " + info.get("serverName"));
                         break;
                     }
                 }

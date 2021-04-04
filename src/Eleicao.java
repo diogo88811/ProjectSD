@@ -126,20 +126,34 @@ public class Eleicao implements Serializable {
             in = reader.readLine();
             l.setNomeLista(in);
             System.out.println("CANDIDATO PRINCIPAL: ");
+            ArrayList<Pessoa> aux = new ArrayList<Pessoa>();
             for(int k = 0; k < pessoa.size(); k++){
-                System.out.println("<" + k +"> "+pessoa.get(k).getNome());
+                if(opt == 1 && pessoa.get(k).getTrabalho().toUpperCase().equals("ESTUDANTE")){
+                    aux.add(pessoa.get(k));
+                }
+                else if(opt == 2 && pessoa.get(k).getTrabalho().toUpperCase().equals("DOCENTE")){
+                    aux.add(pessoa.get(k));
+                }
+                else if(opt == 3 && pessoa.get(k).getTrabalho().toUpperCase().equals("FUNCIONARIO")){
+                    aux.add(pessoa.get(k));
+                }
             }
+
+            for(int k = 0; k<aux.size(); k++){
+                System.out.println("<" + k + "> "+ aux.get(k).getNome());
+            }
+
             numCandidate = scan.nextInt();
-            l.setCandidatoPrincipal(pessoa.get(numCandidate));
+            l.setCandidatoPrincipal(aux.get(numCandidate));
             while(true) {
                 System.out.println("<0> SAIR");
-                for (int k = 0; k < pessoa.size(); k++) {
-                    if(!(l.getPessoas().contains(pessoa.get(k))))
-                        System.out.println("<" + (k+1) + "> " + pessoa.get(k).getNome());
+                for (int k = 0; k < aux.size(); k++) {
+                    if(!(l.getPessoas().contains(aux.get(k))))
+                        System.out.println("<" + (k + 1) + "> " + aux.get(k).getNome());
                 }
                 numCandidate = scan.nextInt();
                 if(numCandidate != 0) {
-                    l.getPessoas().add(pessoa.get(numCandidate - 1));
+                    l.getPessoas().add(aux.get(numCandidate - 1));
                 }else{
                     break;
                 }

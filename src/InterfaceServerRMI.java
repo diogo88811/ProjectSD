@@ -10,6 +10,7 @@ public interface InterfaceServerRMI extends Remote{
 	public void saveClients(String name, InterfaceClientRMI a) throws RemoteException;
 	public void saveAdmin(String name, InterfaceClientRMI a) throws RemoteException ;
     public void print_on_server(String s) throws RemoteException;
+	public ArrayList<Pessoa> getPerson() throws RemoteException ;
     public ArrayList<Pessoa> getEstudantes() throws RemoteException;
 	public ArrayList<Pessoa> getDocentes() throws RemoteException;
 	public ArrayList<Pessoa> getFuncionarios() throws RemoteException;

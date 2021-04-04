@@ -83,11 +83,11 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 					case 2:
 						Eleicao eleicao  = new Eleicao();
 						try{
-							eleicao.createEleicao(h.getEstudantes());
+							eleicao.createEleicao(h.getPerson());
 							h.criarEleicao(eleicao);
 						}catch (Exception e){
 							h = reconectRMI(h);
-							eleicao.createEleicao(h.getEstudantes());
+							eleicao.createEleicao(h.getPerson());
 							h.criarEleicao(eleicao);
 						}
 						break;
@@ -114,11 +114,11 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						if(opt == 1){
 							System.out.println("SELECIONE A LISTA: ");
 							for(int i = 0; i < election.get(eleNum).getListas().size(); i++){
-								System.out.println(i + " " + election.get(eleNum).getListas().get(i).getNomeLista());
+								System.out.println("< " + i + "> " + election.get(eleNum).getListas().get(i).getNomeLista());
 							}
 							int numList = scan.nextInt();
 							Lista l = election.get(eleNum).getListas().get(numList);
-							l.modifyList(h.getEstudantes());
+							l.modifyList(h.getPerson(), election.get(eleNum).getPublicoAlvo());
 							try{
 								h.gerirEleicao(l,eleNum,opt,numList);
 							}catch (Exception e){
@@ -128,7 +128,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						}
 						else if(opt == 2){
 							Lista l = new Lista();
-							l.createList(h.getEstudantes());
+							l.createList(h.getPerson());
 							try{
 								h.gerirEleicao(l,eleNum,opt,0);
 							}catch (Exception e){
