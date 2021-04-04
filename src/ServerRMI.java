@@ -47,6 +47,14 @@ public class ServerRMI extends UnicastRemoteObject implements InterfaceServerRMI
 
 	}
 
+	public void addTable(String name, String cc, String table) throws RemoteException {
+		for(int i = 0; i< person.size(); i++){
+			if(person.get(i).getNome().equals(name) && person.get(i).getCCnumber().equals(cc)){
+				person.get(i).getTables().add(table);
+			}
+		}
+	}
+
 	public ArrayList<Pessoa> getEstudantes() throws RemoteException {
 		return this.Estudantes;
 	}

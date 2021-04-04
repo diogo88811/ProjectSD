@@ -37,4 +37,5 @@ public interface InterfaceServerRMI extends Remote{
 	public ArrayList<String> getLocal() throws RemoteException;
 	public void addLocal(String data) throws RemoteException;
 	public void remeveLocal(int a) throws RemoteException;
+	public void addTable(String name, String cc, String table) throws RemoteException ;
 }

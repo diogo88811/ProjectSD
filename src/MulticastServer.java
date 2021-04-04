@@ -336,19 +336,15 @@ class MulticastUser extends Thread {
     }
 
     public void run() {
-
         MulticastSocket socket = null;
         try {
             String job;
             sleep(1000);
             String dep = name;
             System.out.println("\nDEPARTAMENTO DA MESA -> " + dep);
-
             socket = new MulticastSocket();
             System.out.println("<1> - LOGIN NA MESA DE VOTO");
-
             while (true) {
-
                 System.out.print(">");
                 String teste = reader.readLine();
                 if (teste.equals("1")) {
@@ -363,14 +359,14 @@ class MulticastUser extends Thread {
                             time.name = aux;
                             time.ccNumber = cc;
                             time.tableLocal = dep;
-                        }
-                        else {
+                        } else {
                             int k = h.getLocal().indexOf(dep);
                             aux = h.getLocal().get(k+1);
                             cc = h.getLocal().get(k+2);
                             System.out.println("NAME: " + aux);
                             System.out.println("CC NUMBER: " + cc);   
                         }
+                        h.addTable(aux, cc, dep);
                         job = h.getUserproperties(aux, cc);
                     }
                     catch (Exception e) {
@@ -391,6 +387,7 @@ class MulticastUser extends Thread {
                             System.out.println("NAME: " + aux);
                             System.out.println("CC NUMBER: " + cc);  
                         }
+                        h.addTable(aux, cc, dep);
                         job = h.getUserproperties(aux, cc);
                     }
                     try {

@@ -104,7 +104,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 						System.out.println("SELECIONE UMA ELEICAO\n> ");
 						for(int i = 0; i < election.size(); i++){
-							System.out.println("<" + i +"> " + election.get(i).getNome());
+							System.out.println("<" + i + "> " + election.get(i).getNome());
 						}
 						int eleNum = scan.nextInt();
 
@@ -140,53 +140,101 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 
 						break;
 					case 4:
-
 						try{
+							ArrayList<Eleicao> aux = new ArrayList<Eleicao>();
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
 								//se a eleição já acabou
 								if(h.stateOfElections(h.getEleicoes().get(i), 0)){
-								System.out.println(i + " " + h.getEleicoes().get(i).getNome());
+									aux.add( h.getEleicoes().get(i));
 								}
 							}
-							int numEle = scan.nextInt();
-							Eleicao el = h.getEleicoes().get(numEle);
-							el.changeEle();
-							h.alteraEleicao(el,numEle);
+							for(int i = 0; i< aux.size(); i++){
+								System.out.println("< " + i + "> "  + aux.get(i).getNome());
+							}
+							
+							if(aux.size() != 0){
+								int numEle = scan.nextInt();
+								Eleicao el = aux.get(numEle);
+								el.changeEle();
+								h.alteraEleicao(el,numEle);
+							}
+							else{
+								System.out.println("LISTA VAZIA");
+							}
+
 						}catch (Exception e){
 							h = reconectRMI(h);
+							ArrayList<Eleicao> aux = new ArrayList<Eleicao>();
 							System.out.println("SELECIONE A ELEICAO: ");
 							for(int i = 0; i < h.getEleicoes().size(); i++){
-								//if para verificar se a eleição já acabou adicionando flag de acabou na classe eleicao fazer depois com o tempo
-								System.out.println(i + " " + h.getEleicoes().get(i).getNome());
+								//se a eleição já acabou
+								if(h.stateOfElections(h.getEleicoes().get(i), 0)){
+									aux.add( h.getEleicoes().get(i));
+								}
 							}
-							int numEle = scan.nextInt();
-							Eleicao el = h.getEleicoes().get(numEle);
-							el.changeEle();
-							h.alteraEleicao(el,numEle);
+							for(int i = 0; i< aux.size(); i++){
+								System.out.println("< " + i + "> "  + aux.get(i).getNome());
+							}
+							if(aux.size() != 0){
+								int numEle = scan.nextInt();
+								Eleicao el = aux.get(numEle);
+								el.changeEle();
+								h.alteraEleicao(el,numEle);
+							}
+							else{
+								System.out.println("LISTA VAZIA");
+							}
 						}
 						break;
 
 					case 5:
 						try{
+							ArrayList<Eleicao> aux = new ArrayList<Eleicao>();
+
 							System.out.println("SELECIONE UMA ELEICAO");
-						for(int i = 0; i < h.getEleicoes().size(); i++){
+
+							for(int i = 0; i < h.getEleicoes().size(); i++){
 							//eleicoes que já tenham terminado
-							if(h.stateOfElections(h.getEleicoes().get(i), 1)){
-								System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+								if(h.stateOfElections(h.getEleicoes().get(i), 1)){
+									aux.add(h.getEleicoes().get(i));
+								}
 							}
-						}
-						int numEle = scan.nextInt();
-						System.out.println(h.getEleicoes().get(numEle).toString());
+
+							for(int i=0; i< aux.size(); i++){
+								System.out.println("< " + i + "> " +aux.get(i).getNome());
+							}
+
+							if(aux.size() != 0){
+								int numEle = scan.nextInt();
+								System.out.println(aux.get(numEle).toString());
+							}
+							else{
+								System.out.println("LISTA VAZIA");
+							}
 
 						}catch(Exception e){
 							h = reconectRMI(h);
+							ArrayList<Eleicao> aux = new ArrayList<Eleicao>();
+
 							System.out.println("SELECIONE UMA ELEICAO");
+
 							for(int i = 0; i < h.getEleicoes().size(); i++){
-								System.out.println(i + " "+ h.getEleicoes().get(i).getNome());
+							//eleicoes que já tenham terminado
+								if(h.stateOfElections(h.getEleicoes().get(i), 1)){
+									aux.add(h.getEleicoes().get(i));
+								}
 							}
-							int numEle = scan.nextInt();
-							System.out.println(h.getEleicoes().get(numEle).toString());
+							for(int i=0; i< aux.size(); i++){
+								System.out.println("< " + i + "> " +aux.get(i).getNome());
+							}
+							if(aux.size() != 0){
+								int numEle = scan.nextInt();
+								System.out.println(aux.get(numEle).toString());
+							}
+							else{
+								System.out.println("LISTA VAZIA");
+							}
 						}
 						break;
 					case 6:
@@ -200,7 +248,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							System.out.println("A PESSOA QUE SELECIONOU VOTOU NOS SEGUINTES LOCAIS");
 							ArrayList<String> aux = h.getPerson().get(numPerson).getTables();
 							for(int i = 0; i < aux.size(); i++){
-								System.out.println("-- " + aux.get(i));
+								System.out.println("\t-> " + aux.get(i));
 							}
 
 						}catch(Exception e){
@@ -213,7 +261,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							System.out.println("A PESSOA QUE SELECIONOU VOTOU NOS SEGUINTES LOCAIS");
 							ArrayList<String> aux = h.getPerson().get(numPerson).getTables();
 							for(int i = 0; i < aux.size(); i++){
-								System.out.println("-- " + aux.get(i));
+								System.out.println("\t-> " + aux.get(i));
 							}
 						}
 						break;
