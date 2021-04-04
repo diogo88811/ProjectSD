@@ -114,7 +114,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 						if(opt == 1){
 							System.out.println("SELECIONE A LISTA: ");
 							for(int i = 0; i < election.get(eleNum).getListas().size(); i++){
-								System.out.println(i + " "+ election.get(eleNum).getListas().get(i).getNomeLista());
+								System.out.println(i + " " + election.get(eleNum).getListas().get(i).getNomeLista());
 							}
 							int numList = scan.nextInt();
 							Lista l = election.get(eleNum).getListas().get(numList);

@@ -76,7 +76,9 @@ public class Eleicao implements Serializable {
                 "\nDataFim -> " + DataFim +
                 "\nPublicoAlvo ->" + publicoAlvo + 
                 "\nEstado -> " + estado + listas +
-                "\nVota3ntes -> " + pessoas;
+                "\nVotantes -> " + pessoas +
+                "\nVotos Nulos -> " + votoNulo +
+                "\nVotos Branco -> " + votosBranco;
     }
 
     public void createEleicao(ArrayList<Pessoa> pessoa) throws IOException {
@@ -86,7 +88,6 @@ public class Eleicao implements Serializable {
         Scanner scan = new Scanner(System.in);
         int numberOfLists;
         int numCandidate;
-
 
         System.out.print("NOME ELEICAO: ");
         in = reader.readLine();

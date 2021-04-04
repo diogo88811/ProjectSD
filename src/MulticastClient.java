@@ -142,12 +142,8 @@ public class MulticastClient extends Thread {
                 while (System.currentTimeMillis() - sTime < 60000) {
                     if (System.in.available() > 0) {
                         auxVoto = scan.nextLine();
-                        if (Integer.parseInt(auxVoto) < Integer.parseInt(info.get("item_count"))) {
-                            System.out.println("nao e nulo");
-                            sendData(socket,
-                                    "type | done ; IDclient | " + info.get("username") + " ; voto | "
-                                            + info.get("item_" + Integer.parseInt(auxVoto) + "_name")
-                                            + " ; serverName | " + info.get("serverName"));
+                        if (Integer.parseInt(auxVoto) <= Integer.parseInt(info.get("item_count"))) {
+                            sendData(socket,"type | done ; IDclient | " + info.get("username") + " ; voto | " + info.get("item_" + Integer.parseInt(auxVoto) + "_name") + " ; serverName | " + info.get("serverName"));
                             sendData(socket,
                                     "type | voteDone ; username | " + info.get("username") + " ; eleicao | "
                                             + info.get("eleicao") + " ; ccNumber | " + info.get("ccNumber")

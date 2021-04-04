@@ -288,7 +288,6 @@ public class MulticastServer extends Thread {
         Runtime.getRuntime().addShutdownHook(time);
 
     }
-
 }
 
 class MulticastUser extends Thread {
@@ -358,11 +357,9 @@ class MulticastUser extends Thread {
 
                 System.out.print(">");
                 String teste = reader.readLine();
-
                 if (teste.equals("1")) {
                     server.state = false;
                     String aux, cc;
-
                     try {
                         if(!h.getLocal().contains(dep)){                            
                             System.out.print("NAME: ");
@@ -434,8 +431,8 @@ class MulticastUser extends Thread {
                         }
                         if (flg == 1) {
                             int numEleicoes = keyboardScanner.nextInt();
-                            eleicao = h.getEleicoes().get(numEleicoes).getNome();
-                            tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                            eleicao = votar.get(numEleicoes).getNome();
+                            tamanho = votar.get(numEleicoes).getListas().size();
                             sendToServer(socket,
                                     "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | "
                                             + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | "
@@ -450,8 +447,10 @@ class MulticastUser extends Thread {
                         for (int i = 0; i < h.getEleicoes().size(); i++) {
                             // Não dá display das eleicoes que o utilizador já votou ou das eleicoes que ja acabaram
                             if (h.verifyUserinArray(aux, cc, h.getEleicoes().get(i)) == false && h.stateOfElections(h.getEleicoes().get(i), 2)) {
-                                votar.add(h.getEleicoes().get(i));
-                                flg = 1;
+                                if (h.getEleicoes().get(i).publicoAlvo.toUpperCase().equals(job.toUpperCase())) {
+                                    votar.add(h.getEleicoes().get(i));
+                                    flg = 1;
+                                }
                             }
                         }
                         for(int i = 0; i< votar.size(); i++){
@@ -459,8 +458,8 @@ class MulticastUser extends Thread {
                         }
                         if (flg == 1) {
                             int numEleicoes = keyboardScanner.nextInt();
-                            eleicao = h.getEleicoes().get(numEleicoes).getNome();
-                            tamanho = h.getEleicoes().get(numEleicoes).getListas().size();
+                            eleicao = votar.get(numEleicoes).getNome();
+                            tamanho = votar.get(numEleicoes).getListas().size();
                             sendToServer(socket,
                                     "type | login ; username | " + aux + " ; ccNumber | " + cc + " ; eleicao | "
                                             + eleicao + " ; tamanhoLista | " + tamanho + " ; serverName | "

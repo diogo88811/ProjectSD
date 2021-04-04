@@ -97,7 +97,7 @@ public class Pessoa implements Serializable {
     }
 
     public String toString(){//overriding the toString() method
-        return    "USERNAME: "       +this.nome         +
+        return  "USERNAME: "       + this.nome         +
                 "\nPASSWORD: "     + this.password     +
                 "\nJOB: "          + this.trabalho     +
                 "\nDEPARTAMENTO: " + this.departamento +
@@ -148,8 +148,10 @@ public class Pessoa implements Serializable {
                 break;
             case 2:
                 this.trabalho = "DOCENTE";
+                break;
             case 3:
                 this.trabalho = "FUNCIONARIO";
+                break;
         }
 
         System.out.print("DEPARTAMENTO QUE FREQUENTA: ");
