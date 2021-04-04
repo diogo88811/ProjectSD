@@ -1,35 +1,31 @@
 import java.net.MulticastSocket;
 
 import java.util.HashMap;
-
+import java.util.Properties;
 import java.util.Scanner;
-
 import java.net.DatagramPacket;
-
 import java.net.InetAddress;
-
 import java.io.BufferedReader;
-
+import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.io.InputStreamReader;
 
 public class MulticastClient extends Thread {
 
-    // "224.0.224.0"
     private String MULTICAST_ADDRESS;
     private static MulticastClient client;
     boolean state = true;
     private int PORT = 7000;
+    String args;
     HashMap<String, String> info = new HashMap<String, String>();
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
     Scanner keyboardScanner = new Scanner(System.in);
 
-    public MulticastClient(String MULTICAST_ADDRESS) {
+    public MulticastClient(String MULTICAST_ADDRESS, String args) {
         super("TERMINAL " + (long) (Math.random() * 1000));
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
-
+        this.args = args;
     }
 
     public String sendData(MulticastSocket socket, String msg) throws IOException {
@@ -181,8 +177,13 @@ public class MulticastClient extends Thread {
 
         MulticastSocket socket = null;
         try {
-            System.out.println(
-                    "______________________________< " + this.getName() + " >________________________________________");
+            
+            FileInputStream fis = new FileInputStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(fis);
+            MULTICAST_ADDRESS = String.valueOf(prop.getProperty(args));
+
+            System.out.println("______________________________< " + args + " >________________________________________");
             socket = new MulticastSocket(PORT);
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
@@ -201,7 +202,7 @@ public class MulticastClient extends Thread {
     }
 
     public static void main(String[] args) throws IOException {
-        client = new MulticastClient(args[0]);
+        client = new MulticastClient(args[0], args[0]);
         client.start();
     }
 

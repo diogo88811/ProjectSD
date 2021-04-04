@@ -13,7 +13,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 
 import java.io.BufferedReader;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.io.InputStreamReader;
@@ -23,7 +24,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import java.util.HashMap;
-
+import java.util.Properties;
 import java.util.Scanner;
 
 public class MulticastServer extends Thread {
@@ -31,35 +32,28 @@ public class MulticastServer extends Thread {
     // "224.0.224.0"
 
     private String MULTICAST_ADDRESS;
-
     private int PORT = 7000;
-
     private static MulticastServer server;
-
     private static MulticastUser user;
-
     Scanner keyboardScanner = new Scanner(System.in);
-
     String dataReceived;
-
     // Defesa para a conexão entre server e terminal
-
     int number = 0;
-
     boolean state = true;
-
     InterfaceServerRMI h;
+    String args;
 
     // Construtor
 
-    public MulticastServer(InterfaceServerRMI h, String MULTICAST_ADDRESS) {
+    public MulticastServer(InterfaceServerRMI h, String MULTICAST_ADDRESS, String args) throws IOException {
 
         super("MESA " + (long) (Math.random() * 1000));
-
         this.h = h;
-
-        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
-
+        FileInputStream fis = new FileInputStream("config.properties");
+        Properties prop = new Properties();
+        prop.load(fis);
+        this.MULTICAST_ADDRESS = String.valueOf(prop.getProperty(args));
+        this.args = args;
     }
 
     // Funcao que recebe dados
@@ -67,11 +61,8 @@ public class MulticastServer extends Thread {
     public String receiveData(MulticastSocket socket) throws IOException {
 
         byte[] buffer = new byte[256];
-
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
         socket.receive(packet);
-
         String message = new String(packet.getData(), 0, packet.getLength());
 
         return message;
@@ -79,12 +70,9 @@ public class MulticastServer extends Thread {
     }
 
     // Analisa os dados que recebe e guarda-os numa hashMap
-
     // Consoante o que recebe manda uma mensagem de resposta para o teminal de voto
     // com que este server está a comunicar
-
-    public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info)
-            throws IOException, NotBoundException {
+    public void analyseData(MulticastSocket socket, String data, HashMap<String, String> info) throws IOException, NotBoundException {
 
         String aux[] = data.split("[;]");
         for (String a : aux) {
@@ -243,21 +231,21 @@ public class MulticastServer extends Thread {
 
         try {
 
-            System.out.println("______________________________< " + this.getName() + " >________________________________________");
-            ClientRMI client = new ClientRMI(this.getName());
+            System.out.println("______________________________< " + args + " >________________________________________");
+            ClientRMI client = new ClientRMI(args);
 
             try {
 
                 // Guardamos esta Mesa no Array dos clientes
-                h.saveClients(this.getName(), (InterfaceClientRMI) client);
-                h.notifyClient(this.getName(), " -> on");
+                h.saveClients(args, (InterfaceClientRMI) client);
+                h.notifyClient(args, " -> on");
 
             } catch (Exception e) {
 
                 Registry reg = LocateRegistry.getRegistry("193.168.100.5", 7000);
                 h = (InterfaceServerRMI) reg.lookup("RMI Server");
-                h.saveClients(this.getName(), (InterfaceClientRMI) client);
-                h.notifyClient(this.getName(), " -> on");
+                h.saveClients(args, (InterfaceClientRMI) client);
+                h.notifyClient(args, " -> on");
             }
 
             socket = new MulticastSocket(PORT);
@@ -280,7 +268,7 @@ public class MulticastServer extends Thread {
 
         Registry reg = LocateRegistry.getRegistry("193.168.100.5", 7000);
         InterfaceServerRMI h = (InterfaceServerRMI) reg.lookup("RMI Server");
-        server = new MulticastServer(h, args[0]); // THREAD RECEBE
+        server = new MulticastServer(h, args[0], args[0]); // THREAD RECEBE
         server.start();
         RuntimeDemo time = new RuntimeDemo(h, server);
         user = new MulticastUser(h, server, args[0], time); // THREAD ENVIA
@@ -294,6 +282,7 @@ class MulticastUser extends Thread {
 
     // "224.0.224.0"
     private String MULTICAST_ADDRESS;
+    String name;
     private int PORT = 7000;
     MulticastServer server;
     boolean verify = false;
@@ -318,11 +307,15 @@ class MulticastUser extends Thread {
         return h;
     }
 
-    public MulticastUser(InterfaceServerRMI h, MulticastServer server, String MULTICAST_ADDRESS, RuntimeDemo time) {
+    public MulticastUser(InterfaceServerRMI h, MulticastServer server, String args, RuntimeDemo time) throws IOException {
         super("MESA " + (long) (Math.random() * 1000));
         this.h = h;
         this.server = server;
-        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
+        FileInputStream fis = new FileInputStream("config.properties");
+        Properties prop = new Properties();
+        prop.load(fis);
+        this.MULTICAST_ADDRESS = String.valueOf(prop.getProperty(args));
+        this.name = args;
         this.time = time;
     }
 
@@ -348,8 +341,9 @@ class MulticastUser extends Thread {
         try {
             String job;
             sleep(1000);
-            System.out.print("\nIDENTIFICA O DEPARTAMENTO DESTA MESA DE VOTO: ");
-            String dep = reader.readLine();
+            String dep = name;
+            System.out.println("\nDEPARTAMENTO DA MESA -> " + dep);
+
             socket = new MulticastSocket();
             System.out.println("<1> - LOGIN NA MESA DE VOTO");
 
