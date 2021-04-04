@@ -67,6 +67,7 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 				System.out.println("<3> GERIR CANDIDATOS A UMA ELEICAO ");
 				System.out.println("<4> ALTERAR PROPRIEDADES DE UMA ELEICAO");
 				System.out.println("<5> CONSULTAR DADOS DAS ANTIGAS ELEICOES");
+				System.out.println("<6> LOCAL ONDE AS PESSOAS VOTARAM");
 				System.out.print(">");
 				menuOption = scan.nextInt();
 				switch(menuOption){
@@ -186,6 +187,34 @@ public class ClientRMI extends UnicastRemoteObject implements InterfaceClientRMI
 							}
 							int numEle = scan.nextInt();
 							System.out.println(h.getEleicoes().get(numEle).toString());
+						}
+						break;
+					case 6:
+						System.out.println("SELECIONE A PESSOA QUE DESEJA");
+						try{
+							for(int i = 0; i < h.getPerson().size(); i++){
+								System.out.println("<" + i + "> " + h.getPerson().get(i).getNome());
+							}
+
+							int numPerson = scan.nextInt();
+							System.out.println("A PESSOA QUE SELECIONOU VOTOU NOS SEGUINTES LOCAIS");
+							ArrayList<String> aux = h.getPerson().get(numPerson).getTables();
+							for(int i = 0; i < aux.size(); i++){
+								System.out.println("-- " + aux.get(i));
+							}
+
+						}catch(Exception e){
+							h = reconectRMI(h);
+							for(int i = 0; i < h.getPerson().size(); i++){
+								System.out.println("<" + i + "> " + h.getPerson().get(i).getNome());
+							}
+
+							int numPerson = scan.nextInt();
+							System.out.println("A PESSOA QUE SELECIONOU VOTOU NOS SEGUINTES LOCAIS");
+							ArrayList<String> aux = h.getPerson().get(numPerson).getTables();
+							for(int i = 0; i < aux.size(); i++){
+								System.out.println("-- " + aux.get(i));
+							}
 						}
 						break;
 				}
