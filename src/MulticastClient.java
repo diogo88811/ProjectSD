@@ -184,6 +184,7 @@ public class MulticastClient extends Thread {
             MULTICAST_ADDRESS = String.valueOf(prop.getProperty(args));
 
             System.out.println("______________________________< " + args + " >________________________________________");
+            System.out.println("______________________________< " + this.getName() + " >________________________________________");
             socket = new MulticastSocket(PORT);
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);

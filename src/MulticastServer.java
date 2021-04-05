@@ -232,20 +232,21 @@ public class MulticastServer extends Thread {
         try {
 
             System.out.println("______________________________< " + args + " >________________________________________");
-            ClientRMI client = new ClientRMI(args);
+            System.out.println("______________________________< " + this.getName() + " >________________________________________");
+            ClientRMI client = new ClientRMI(this.getName());
 
             try {
 
                 // Guardamos esta Mesa no Array dos clientes
-                h.saveClients(args, (InterfaceClientRMI) client);
-                h.notifyClient(args, " -> on");
+                h.saveClients(this.getName(), (InterfaceClientRMI) client);
+                h.notifyClient(this.getName(), " -> on");
 
             } catch (Exception e) {
 
                 Registry reg = LocateRegistry.getRegistry("193.168.100.5", 7000);
                 h = (InterfaceServerRMI) reg.lookup("RMI Server");
-                h.saveClients(args, (InterfaceClientRMI) client);
-                h.notifyClient(args, " -> on");
+                h.saveClients(this.getName(), (InterfaceClientRMI) client);
+                h.notifyClient(this.getName(), " -> on");
             }
 
             socket = new MulticastSocket(PORT);
