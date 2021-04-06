@@ -161,7 +161,7 @@ public class Lista implements Serializable  {
                 System.out.println("LISTA DE PESSOAS QUE PODE ADICIONAR: ");
 
                 for(int i = 0; i< pessoas.size(); i++){
-                    if(tipo.toUpperCase().equals(pessoas.get(i).getTrabalho()) && !this.getPessoas().contains(aux.get(i))){
+                    if(tipo.toUpperCase().equals(pessoas.get(i).getTrabalho())){
                         aux.add(pessoas.get(i));
                     }
                 }
